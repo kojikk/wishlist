@@ -13,13 +13,14 @@
   --tx:#f0ede8;--tx2:rgba(240,237,232,.5);--tx3:rgba(240,237,232,.22);
   --ac:#e8c84a;--adim:rgba(232,200,74,.1);--abr:rgba(232,200,74,.3);
   --gn:#4ade80;--gdim:rgba(74,222,128,.08);--gbr:rgba(74,222,128,.22);
+  --bl:#63b3ed;--bdim:rgba(99,179,237,.08);--bbr:rgba(99,179,237,.22);
   --red:#f87171;--rdim:rgba(248,113,113,.08);--rbr:rgba(248,113,113,.22);
   --r:10px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
 
-/* AUTH OVERLAY */
+/* AUTH */
 #auth-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center}
 .auth-box{background:var(--sf);border:1px solid var(--br2);border-radius:16px;padding:32px;width:340px;text-align:center}
 .auth-logo{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px}
@@ -35,23 +36,22 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 /* LAYOUT */
 #app{display:none;height:100vh;flex-direction:column}
 #app.on{display:flex}
-
-.topbar{background:var(--sf);border-bottom:1px solid var(--br);padding:12px 24px;display:flex;align-items:center;gap:16px;flex-shrink:0}
-.topbar-logo{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700}
+.topbar{background:var(--sf);border-bottom:1px solid var(--br);padding:12px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0;min-width:0}
+.topbar-logo{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;white-space:nowrap}
 .topbar-logo em{color:var(--ac);font-style:normal}
-.topbar-badge{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--rdim);color:var(--red);border:1px solid var(--rbr)}
-.topbar-right{margin-left:auto;display:flex;gap:8px}
-.tbtn{padding:7px 14px;border-radius:8px;border:1px solid var(--br2);background:none;color:var(--tx2);font-size:12px;cursor:pointer;font-family:'Onest',sans-serif;transition:.15s}
+.topbar-badge{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--rdim);color:var(--red);border:1px solid var(--rbr);flex-shrink:0}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.save-status{font-size:12px;color:var(--tx3);transition:.3s;white-space:nowrap}
+.save-status.ok{color:var(--gn)}.save-status.err{color:var(--red)}
+.tbtn{padding:7px 14px;border-radius:8px;border:1px solid var(--br2);background:none;color:var(--tx2);font-size:12px;cursor:pointer;font-family:'Onest',sans-serif;transition:.15s;white-space:nowrap}
 .tbtn:hover{background:var(--sf2);color:var(--tx)}
 .tbtn.primary{background:var(--ac);color:#0f0f0f;border-color:var(--ac);font-weight:500}
 .tbtn.primary:hover{filter:brightness(1.08)}
 .tbtn.danger{color:var(--red);border-color:var(--rbr)}
 .tbtn.danger:hover{background:var(--rdim)}
-.save-status{font-size:12px;color:var(--tx3);transition:.3s}
-.save-status.ok{color:var(--gn)}
-.save-status.err{color:var(--red)}
+.tbtn.sm{padding:4px 10px;font-size:11px}
 
-.body{display:flex;flex:1;min-height:0}
+.body{display:flex;flex:1;min-height:0;overflow:hidden}
 
 /* SIDEBAR NAV */
 .panel-nav{width:200px;flex-shrink:0;border-right:1px solid var(--br);padding:12px 8px;overflow-y:auto}
@@ -64,79 +64,121 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 /* MAIN PANEL */
 .panel-main{flex:1;min-width:0;overflow-y:auto;padding:20px 24px}
 
-/* SECTION EDITOR */
-.cat-block{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
-.cat-header{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;transition:background .14s}
+/* CATEGORY BLOCK */
+.cat-block{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);margin-bottom:10px;transition:border-color .15s,opacity .15s}
+.cat-block.dragging{opacity:.4}
+.cat-block.drag-over{border-color:var(--ac);background:var(--adim)}
+.cat-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;transition:background .14s}
 .cat-header:hover{background:var(--sf2)}
-.cat-drag{color:var(--tx3);font-size:16px;cursor:grab;flex-shrink:0}
-.cat-drag:active{cursor:grabbing}
-.cat-emoji-inp{width:38px;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:4px;font-size:18px;text-align:center;outline:none;flex-shrink:0}
-.cat-title-inp{flex:1;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:5px 10px;font-family:'Unbounded',sans-serif;font-size:12px;font-weight:600;color:var(--tx);outline:none;transition:border-color .2s}
+.cat-drag-handle{cursor:grab;color:var(--tx3);font-size:15px;line-height:1;padding:2px 2px;flex-shrink:0;transition:color .13s}
+.cat-drag-handle:hover{color:var(--tx2)}
+.cat-drag-handle:active{cursor:grabbing}
+.cat-move{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.cat-move button{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:12px;line-height:1.2;padding:1px 4px;border-radius:3px;transition:.13s}
+.cat-move button:hover:not(:disabled){color:var(--tx);background:var(--sf3)}
+.cat-move button:disabled{opacity:.2;cursor:default}
+.cat-emoji-inp{width:36px;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:3px;font-size:18px;text-align:center;outline:none;flex-shrink:0}
+.cat-title-inp{flex:1;min-width:0;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:5px 10px;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;color:var(--tx);outline:none;transition:border-color .2s}
 .cat-title-inp:focus{border-color:var(--br2)}
-.cat-sub-inp{width:220px;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--tx2);outline:none;transition:border-color .2s}
+.cat-sub-inp{width:180px;flex-shrink:0;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--tx2);outline:none;transition:border-color .2s}
 .cat-sub-inp:focus{border-color:var(--br2)}
 .cat-sub-inp::placeholder{color:var(--tx3)}
 .cat-toggle{color:var(--tx3);font-size:10px;transition:transform .2s;flex-shrink:0}
 .cat-toggle.op{transform:rotate(90deg)}
-.cat-del{color:var(--tx3);background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;transition:color .15s;flex-shrink:0}
+.cat-del{color:var(--tx3);background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;transition:color .15s;flex-shrink:0}
 .cat-del:hover{color:var(--red)}
-
-.cat-body{border-top:1px solid var(--br);padding:10px 14px;display:none}
+.cat-body{border-top:1px solid var(--br);padding:10px 12px;display:none}
 .cat-block.expanded .cat-body{display:block}
 
 /* ITEM ROW */
 .item-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--br)}
 .item-row:last-child{border-bottom:none}
-.item-drag{color:var(--tx3);font-size:14px;cursor:grab;padding-top:8px;flex-shrink:0}
-.item-fields{flex:1;display:flex;flex-direction:column;gap:5px}
+.item-move{display:flex;flex-direction:column;gap:1px;flex-shrink:0;padding-top:6px}
+.item-move button{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;line-height:1.2;padding:1px 3px;border-radius:3px;transition:.13s}
+.item-move button:hover:not(:disabled){color:var(--tx);background:var(--sf3)}
+.item-move button:disabled{opacity:.2;cursor:default}
+.item-fields{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
 .item-row-top{display:flex;gap:6px}
-.item-name-inp{flex:1;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:6px 10px;font-size:13px;font-weight:500;color:var(--tx);outline:none;transition:border-color .2s}
+.item-name-inp{flex:1;min-width:0;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:6px 10px;font-size:13px;font-weight:500;color:var(--tx);outline:none;transition:border-color .2s}
 .item-name-inp:focus{border-color:var(--br2)}
-.item-sub-inp{width:800px;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--tx2);outline:none;transition:border-color .2s}
+.item-sub-inp{width:200px;flex-shrink:0;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--tx2);outline:none;transition:border-color .2s}
 .item-sub-inp:focus{border-color:var(--br2)}
 .item-sub-inp::placeholder{color:var(--tx3)}
 .item-links-area{display:flex;flex-direction:column;gap:4px}
 .link-row{display:flex;gap:5px;align-items:center}
-.link-inp{background:var(--sf3);border:1px solid var(--br);border-radius:5px;padding:4px 8px;font-size:11px;color:var(--tx2);outline:none;transition:border-color .2s;flex:1}
+.link-inp{background:var(--sf3);border:1px solid var(--br);border-radius:5px;padding:4px 8px;font-size:11px;color:var(--tx2);outline:none;transition:border-color .2s;flex:1;min-width:0}
 .link-inp.url{flex:2}
 .link-inp:focus{border-color:var(--br2)}
 .link-inp::placeholder{color:var(--tx3)}
-.link-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px;transition:color .15s}
+.link-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px;transition:color .15s;flex-shrink:0}
 .link-del:hover{color:var(--red)}
 .add-link-btn{font-size:11px;color:var(--tx3);background:none;border:1px dashed var(--br);border-radius:5px;padding:3px 9px;cursor:pointer;transition:.15s;font-family:'Onest',sans-serif}
 .add-link-btn:hover{color:var(--tx2);border-color:var(--br2)}
-.item-del{color:var(--tx3);background:none;border:none;cursor:pointer;font-size:16px;padding-top:6px;flex-shrink:0;transition:color .15s}
+.item-del{color:var(--tx3);background:none;border:none;cursor:pointer;font-size:15px;padding-top:6px;flex-shrink:0;transition:color .15s}
 .item-del:hover{color:var(--red)}
-
 .add-item-btn{width:100%;margin-top:10px;padding:8px;border-radius:7px;border:1px dashed var(--br);background:none;color:var(--tx3);font-size:12px;cursor:pointer;transition:.15s;font-family:'Onest',sans-serif}
 .add-item-btn:hover{color:var(--tx2);border-color:var(--br2)}
-
 .add-cat-btn{width:100%;padding:11px;border-radius:var(--r);border:1px dashed var(--br2);background:none;color:var(--tx2);font-size:13px;cursor:pointer;transition:.15s;font-family:'Onest',sans-serif;margin-top:4px}
 .add-cat-btn:hover{background:var(--sf);color:var(--tx)}
 
-/* BOOKINGS TAB */
+/* EXTERNAL CATEGORY BLOCK */
+.ext-block{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);margin-bottom:10px;padding:12px 14px}
+.ext-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ext-badge{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--bdim);color:var(--bl);border:1px solid var(--bbr)}
+.ext-info{font-size:12px;color:var(--tx3)}
+.ext-items{font-size:12px;color:var(--tx2);max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+.ext-item{padding:3px 0;border-bottom:1px solid var(--br)}
+.ext-item:last-child{border-bottom:none}
+
+/* BOOKINGS */
 .bk-table{width:100%;border-collapse:collapse}
 .bk-table th{text-align:left;font-size:11px;color:var(--tx3);padding:6px 10px;border-bottom:1px solid var(--br);font-weight:500}
 .bk-table td{padding:8px 10px;border-bottom:1px solid var(--br);font-size:13px;vertical-align:top}
 .bk-table tr:last-child td{border-bottom:none}
 .bk-item-name{color:var(--tx);font-weight:500}
 .bk-item-cat{color:var(--tx3);font-size:11px}
-.bk-user{color:var(--bl, #63b3ed)}
+.bk-user{color:var(--bl)}
 .bk-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;transition:.15s;padding:2px 6px}
 .bk-del:hover{color:var(--red)}
 .bk-empty{padding:40px;text-align:center;color:var(--tx3)}
+
+/* SETTINGS TAB */
+.settings-section{margin-bottom:24px}
+.settings-title{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:12px;letter-spacing:-.2px}
+.pl-row{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.pl-fields{display:flex;flex-direction:column;gap:6px}
+.pl-row-top{display:flex;gap:8px;align-items:center}
+.pl-type-sel{background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:6px 10px;font-family:'Onest',sans-serif;font-size:12px;color:var(--tx2);outline:none;flex-shrink:0;cursor:pointer}
+.pl-type-sel:focus{border-color:var(--br2)}
+.pl-inp{flex:1;min-width:0;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:6px 10px;font-size:13px;color:var(--tx);outline:none;transition:.2s;font-family:'Onest',sans-serif}
+.pl-inp:focus{border-color:var(--br2)}
+.pl-inp::placeholder{color:var(--tx3)}
+.pl-row-bottom{display:flex;gap:8px}
+.pl-row-actions{display:flex;gap:6px;justify-content:space-between;margin-top:8px}
+.pl-move{display:flex;gap:4px}
+.parser-row{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.parser-name{font-weight:500;flex:1}
+.parser-meta{font-size:12px;color:var(--tx3)}
+.parser-enabled{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2)}
+.parser-url-inp{flex:1;min-width:0;background:var(--sf2);border:1px solid var(--br);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--tx2);outline:none;transition:.2s;font-family:'Onest',sans-serif}
+.parser-url-inp:focus{border-color:var(--br2)}
+.parser-url-inp::placeholder{color:var(--tx3)}
+.toggle{width:36px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;transition:.2s;flex-shrink:0;background:var(--sf3)}
+.toggle.on{background:var(--ac)}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}
+.toggle.on::after{left:19px}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:#242424;border:1px solid var(--br2);border-radius:99px;padding:8px 18px;font-size:13px;font-weight:500;z-index:300;opacity:0;pointer-events:none;transition:all .22s;white-space:nowrap}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* EMPTY */
 .panel-empty{padding:60px 24px;text-align:center;color:var(--tx3)}
+.sect-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sect-hdr h2{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:600;color:var(--tx2)}
 </style>
 </head>
 <body>
 
-<!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">Вишлист <em>✦</em></div>
@@ -147,7 +189,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div class="topbar">
     <div class="topbar-logo">Вишлист <em>✦</em></div>
@@ -155,7 +196,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
     <span class="save-status" id="save-status"></span>
     <div class="topbar-right">
       <button class="tbtn" onclick="window.open('/', '_blank')">← Открыть сайт</button>
-      <button class="tbtn primary" id="save-btn" onclick="saveWishlist()">Сохранить</button>
+      <button class="tbtn primary" id="save-btn" onclick="handleSave()">Сохранить</button>
     </div>
   </div>
   <div class="body">
@@ -165,6 +206,9 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
       </div>
       <div class="pnav-item" data-tab="bookings" onclick="switchTab('bookings')">
         <span class="pnav-em">🔒</span> Брони
+      </div>
+      <div class="pnav-item" data-tab="settings" onclick="switchTab('settings')">
+        <span class="pnav-em">⚙️</span> Настройки
       </div>
     </nav>
     <div class="panel-main" id="panel-main">
@@ -178,6 +222,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 <script>
 let TOKEN = '';
 let wishlist = [];
+let appConfig = {};
 let currentTab = 'wishlist';
 let saveTimer = null;
 
@@ -197,7 +242,12 @@ async function doAuth() {
     return;
   }
   TOKEN = t;
-  wishlist = await r.json();
+  const [wl, ac] = await Promise.all([
+    r.json(),
+    fetch('/api/admin/app-config', { headers: { 'x-admin-token': t } }).then(r => r.json()),
+  ]);
+  wishlist = wl;
+  appConfig = ac;
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').classList.add('on');
   renderTab();
@@ -207,33 +257,99 @@ async function doAuth() {
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.pnav-item').forEach(el => el.classList.toggle('on', el.dataset.tab === tab));
-  // update save button visibility
-  document.getElementById('save-btn').style.display = tab === 'wishlist' ? '' : 'none';
+  document.getElementById('save-btn').style.display = (tab === 'wishlist' || tab === 'settings') ? '' : 'none';
   renderTab();
+}
+
+function handleSave() {
+  if (currentTab === 'wishlist') saveWishlist();
+  else if (currentTab === 'settings') saveAppConfig();
 }
 
 function renderTab() {
   if (currentTab === 'wishlist') renderWishlistEditor();
-  else renderBookings();
+  else if (currentTab === 'bookings') renderBookings();
+  else if (currentTab === 'settings') renderSettings();
 }
 
 // ── WISHLIST EDITOR ───────────────────────────────────────────────────────────
 function renderWishlistEditor() {
   const el = document.getElementById('panel-main');
-  el.innerHTML = wishlist.map((cat, ci) => renderCatBlock(cat, ci)).join('') +
-    `<button class="add-cat-btn" onclick="addCategory()">+ Добавить категорию</button>`;
+  const externalBlock = buildExternalBlock();
+  el.innerHTML =
+    wishlist.map((cat, ci) => renderCatBlock(cat, ci)).join('') +
+    `<button class="add-cat-btn" onclick="addCategory()">+ Добавить категорию</button>` +
+    (externalBlock ? `<div style="margin-top:20px">${externalBlock}</div>` : '');
+}
+
+function buildExternalBlock() {
+  const steamCfg = appConfig.parsers?.steam;
+  if (!steamCfg?.enabled) return '';
+  return `<div class="ext-block">
+    <div class="ext-header">
+      <span>${steamCfg.category_emoji||'🎮'} ${steamCfg.category_title||'Steam'}</span>
+      <span class="ext-badge">парсер</span>
+      <button class="tbtn sm" onclick="refreshParser('steam')" style="margin-left:auto">🔄 Обновить</button>
+    </div>
+    <div class="ext-info" id="steam-parser-info">Загрузка…</div>
+  </div>`;
+}
+
+async function refreshParser(id) {
+  const info = document.getElementById(`${id}-parser-info`);
+  if (info) info.textContent = 'Обновляем…';
+  try {
+    const r = await fetch(`/api/admin/parsers/${id}/refresh`, { method: 'POST', headers: { 'x-admin-token': TOKEN } });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || r.status);
+    showToast(`✓ Загружено ${data.count} игр`);
+    if (info) info.textContent = `${data.count} игр`;
+  } catch (e) {
+    showToast('Ошибка: ' + e.message);
+    if (info) info.textContent = 'Ошибка: ' + e.message;
+  }
+}
+
+(async function loadParserStatus() {
+  // Will be called after auth, but panel may not be rendered yet — called lazily in renderWishlistEditor too
+})();
+
+async function updateParserStatus() {
+  try {
+    const r = await fetch('/api/admin/parsers', { headers: { 'x-admin-token': TOKEN } });
+    if (!r.ok) return;
+    const data = await r.json();
+    for (const [id, info] of Object.entries(data)) {
+      const el = document.getElementById('pstat-' + id);
+      if (!el) continue;
+      if (info.itemCount !== null) {
+        const date = info.fetchedAt ? new Date(info.fetchedAt).toLocaleString('ru') : '—';
+        el.textContent = `${info.itemCount} позиций · обновлено ${date}`;
+      } else {
+        el.textContent = 'Ещё не загружено';
+      }
+    }
+  } catch {}
 }
 
 function renderCatBlock(cat, ci) {
-  const items = (cat.items || []).map((item, ii) => renderItemRow(ci, ii, item)).join('');
-  return `<div class="cat-block expanded" id="cat-${ci}">
+  const items = (cat.items || []).map((item, ii) => renderItemRow(ci, ii, item, cat.items.length)).join('');
+  return `<div class="cat-block expanded" id="cat-${ci}"
+    ondragover="catDragOver(event,${ci})" ondragleave="catDragLeave(event,${ci})"
+    ondrop="catDrop(event,${ci})" ondragend="catDragEnd(event)">
     <div class="cat-header" onclick="toggleCat(${ci})">
-      <span class="cat-drag" title="Перетащить">⠿</span>
+      <span class="cat-drag-handle" title="Перетащить"
+        onmousedown="catEnableDrag(${ci},event)" onmouseup="catDisableDrag(${ci})"
+        onclick="event.stopPropagation()">⠿</span>
+      <div class="cat-move" onclick="event.stopPropagation()">
+        <button onclick="moveCat(${ci},-1)" ${ci===0?'disabled':''} title="Вверх">↑</button>
+        <button onclick="moveCat(${ci},1)" ${ci===wishlist.length-1?'disabled':''} title="Вниз">↓</button>
+      </div>
       <input class="cat-emoji-inp" value="${esc(cat.emoji||'📦')}" maxlength="2"
         onchange="setCatField(${ci},'emoji',this.value)" onclick="event.stopPropagation()">
-      <input class="cat-title-inp" value="${esc(cat.title||'')}" placeholder="Название категории"
+      <input class="cat-title-inp" value="${esc(cat.title||'')}" placeholder="Название"
         onchange="setCatField(${ci},'title',this.value)" onclick="event.stopPropagation()">
-      <input class="cat-sub-inp" value="${esc(cat.sub||'')}" placeholder="Описание (необязательно)"
+      <input class="cat-sub-inp" value="${esc(cat.sub||'')}" placeholder="Описание"
         onchange="setCatField(${ci},'sub',this.value)" onclick="event.stopPropagation()">
       <span class="cat-toggle op">▶</span>
       <button class="cat-del" onclick="event.stopPropagation();deleteCategory(${ci})" title="Удалить">✕</button>
@@ -245,26 +361,29 @@ function renderCatBlock(cat, ci) {
   </div>`;
 }
 
-function renderItemRow(ci, ii, item) {
+function renderItemRow(ci, ii, item, total) {
   const links = (item.links || []).map((l, li) => `
-    <div class="link-row" id="lr-${ci}-${ii}-${li}">
-      <input class="link-inp" placeholder="Текст ссылки" value="${esc(l.label||'')}"
+    <div class="link-row">
+      <input class="link-inp" placeholder="Текст" value="${esc(l.label||'')}"
         onchange="setLinkField(${ci},${ii},${li},'label',this.value)">
-      <input class="link-inp url" placeholder="https://..." value="${esc(l.url||'')}"
+      <input class="link-inp url" placeholder="https://…" value="${esc(l.url||'')}"
         onchange="setLinkField(${ci},${ii},${li},'url',this.value)">
       <button class="link-del" onclick="deleteLink(${ci},${ii},${li})">✕</button>
     </div>`).join('');
 
   return `<div class="item-row" id="ir-${ci}-${ii}">
-    <span class="item-drag">⠿</span>
+    <div class="item-move">
+      <button onclick="moveItem(${ci},${ii},-1)" ${ii===0?'disabled':''}>↑</button>
+      <button onclick="moveItem(${ci},${ii},1)" ${ii===total-1?'disabled':''}>↓</button>
+    </div>
     <div class="item-fields">
       <div class="item-row-top">
         <input class="item-name-inp" value="${esc(item.name||'')}" placeholder="Название желания"
           onchange="setItemField(${ci},${ii},'name',this.value)">
-        <input class="item-sub-inp" value="${esc(item.sub||'')}" placeholder="Уточнение (необязательно)"
+        <input class="item-sub-inp" value="${esc(item.sub||'')}" placeholder="Уточнение"
           onchange="setItemField(${ci},${ii},'sub',this.value)">
       </div>
-      <div class="item-links-area" id="ila-${ci}-${ii}">
+      <div class="item-links-area">
         ${links}
         <button class="add-link-btn" onclick="addLink(${ci},${ii})">+ ссылка</button>
       </div>
@@ -279,84 +398,126 @@ function toggleCat(ci) {
   if (arr) arr.classList.toggle('op');
 }
 
-// ── MUTATIONS ────────────────────────────────────────────────────────────────
-function setCatField(ci, field, val) {
-  wishlist[ci][field] = val;
-  scheduleSave();
+// ── MUTATIONS ─────────────────────────────────────────────────────────────────
+function setCatField(ci, field, val) { wishlist[ci][field]=val; scheduleSave(); }
+function setItemField(ci, ii, field, val) { wishlist[ci].items[ii][field]=val; scheduleSave(); }
+function setLinkField(ci, ii, li, field, val) { wishlist[ci].items[ii].links[li][field]=val; scheduleSave(); }
+
+function moveCat(ci, dir) {
+  const ni = ci + dir;
+  if (ni < 0 || ni >= wishlist.length) return;
+  [wishlist[ci], wishlist[ni]] = [wishlist[ni], wishlist[ci]];
+  renderWishlistEditor(); scheduleSave();
 }
-function setItemField(ci, ii, field, val) {
-  wishlist[ci].items[ii][field] = val;
-  scheduleSave();
+
+// ── DRAG-AND-DROP CATEGORIES ──────────────────────────────────────────────────
+let catDragIdx = null;
+
+function catEnableDrag(ci, e) {
+  e.stopPropagation();
+  const block = document.getElementById('cat-' + ci);
+  if (!block) return;
+  block.setAttribute('draggable', 'true');
+  block.addEventListener('dragstart', ev => {
+    catDragIdx = ci;
+    block.classList.add('dragging');
+    ev.dataTransfer.effectAllowed = 'move';
+  }, { once: true });
 }
-function setLinkField(ci, ii, li, field, val) {
-  wishlist[ci].items[ii].links[li][field] = val;
-  scheduleSave();
+function catDisableDrag(ci) {
+  document.getElementById('cat-' + ci)?.removeAttribute('draggable');
+}
+function catDragOver(e, ci) {
+  if (catDragIdx === null || catDragIdx === ci) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.cat-block').forEach(b => b.classList.remove('drag-over'));
+  document.getElementById('cat-' + ci)?.classList.add('drag-over');
+}
+function catDragLeave(e, ci) {
+  if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget))
+    document.getElementById('cat-' + ci)?.classList.remove('drag-over');
+}
+function catDrop(e, ci) {
+  e.preventDefault();
+  if (catDragIdx === null || catDragIdx === ci) return;
+  const item = wishlist.splice(catDragIdx, 1)[0];
+  wishlist.splice(ci, 0, item);
+  catDragIdx = null;
+  renderWishlistEditor(); scheduleSave();
+}
+function catDragEnd() {
+  catDragIdx = null;
+  document.querySelectorAll('.cat-block').forEach(b => {
+    b.removeAttribute('draggable');
+    b.classList.remove('dragging', 'drag-over');
+  });
+}
+
+function moveItem(ci, ii, dir) {
+  const ni = ii + dir;
+  if (ni < 0 || ni >= wishlist[ci].items.length) return;
+  [wishlist[ci].items[ii], wishlist[ci].items[ni]] = [wishlist[ci].items[ni], wishlist[ci].items[ii]];
+  renderWishlistEditor(); scheduleSave();
 }
 
 function addCategory() {
-  wishlist.push({ id: 'cat_' + Date.now(), emoji: '📦', title: 'Новая категория', sub: '', items: [] });
+  wishlist.push({ id:'cat_'+Date.now(), emoji:'📦', title:'Новая категория', sub:'', items:[] });
   renderWishlistEditor();
-  // scroll to bottom
   document.getElementById('panel-main').scrollTop = 99999;
 }
 
 function deleteCategory(ci) {
-  if (!confirm(`Удалить категорию «${wishlist[ci].title}» и все её желания?`)) return;
+  if (!confirm(`Удалить «${wishlist[ci].title}» и все желания?`)) return;
   wishlist.splice(ci, 1);
-  renderWishlistEditor();
-  scheduleSave();
+  renderWishlistEditor(); scheduleSave();
 }
 
 function addItem(ci) {
   if (!wishlist[ci].items) wishlist[ci].items = [];
-  wishlist[ci].items.push({ id: 'item_' + Date.now(), name: '', sub: '', links: [] });
+  wishlist[ci].items.push({ id:'item_'+Date.now(), name:'', sub:'', links:[] });
   renderWishlistEditor();
-  // focus new name input
   const ii = wishlist[ci].items.length - 1;
   setTimeout(() => document.querySelector(`#ir-${ci}-${ii} .item-name-inp`)?.focus(), 50);
 }
 
-function deleteItem(ci, ii) {
-  wishlist[ci].items.splice(ii, 1);
-  renderWishlistEditor();
-  scheduleSave();
-}
+function deleteItem(ci, ii) { wishlist[ci].items.splice(ii,1); renderWishlistEditor(); scheduleSave(); }
 
 function addLink(ci, ii) {
   if (!wishlist[ci].items[ii].links) wishlist[ci].items[ii].links = [];
-  wishlist[ci].items[ii].links.push({ label: '', url: '' });
+  wishlist[ci].items[ii].links.push({ label:'', url:'' });
   renderWishlistEditor();
 }
-
-function deleteLink(ci, ii, li) {
-  wishlist[ci].items[ii].links.splice(li, 1);
-  renderWishlistEditor();
-  scheduleSave();
-}
+function deleteLink(ci, ii, li) { wishlist[ci].items[ii].links.splice(li,1); renderWishlistEditor(); scheduleSave(); }
 
 // ── SAVE ─────────────────────────────────────────────────────────────────────
 function scheduleSave() {
-  setStatus('');
-  clearTimeout(saveTimer);
+  setStatus(''); clearTimeout(saveTimer);
   saveTimer = setTimeout(saveWishlist, 1500);
 }
 
 async function saveWishlist() {
-  clearTimeout(saveTimer);
-  setStatus('Сохранение…');
+  clearTimeout(saveTimer); setStatus('Сохранение…');
   try {
     const r = await fetch('/api/admin/wishlist', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
+      method:'PUT', headers:{'Content-Type':'application/json','x-admin-token':TOKEN},
       body: JSON.stringify(wishlist),
     });
     if (!r.ok) throw new Error(await r.text());
-    setStatus('✓ Сохранено', 'ok');
-    showToast('✓ Сохранено');
-  } catch (e) {
-    setStatus('Ошибка: ' + e.message, 'err');
-    showToast('Ошибка сохранения');
-  }
+    setStatus('✓ Сохранено','ok'); showToast('✓ Сохранено');
+  } catch(e) { setStatus('Ошибка: '+e.message,'err'); showToast('Ошибка'); }
+}
+
+async function saveAppConfig() {
+  setStatus('Сохранение…');
+  try {
+    const r = await fetch('/api/admin/app-config', {
+      method:'PUT', headers:{'Content-Type':'application/json','x-admin-token':TOKEN},
+      body: JSON.stringify(appConfig),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    setStatus('✓ Сохранено','ok'); showToast('✓ Настройки сохранены');
+  } catch(e) { setStatus('Ошибка: '+e.message,'err'); showToast('Ошибка'); }
 }
 
 function setStatus(msg, cls='') {
@@ -365,7 +526,128 @@ function setStatus(msg, cls='') {
   el.className = 'save-status' + (cls ? ' '+cls : '');
 }
 
-// ── BOOKINGS TAB ──────────────────────────────────────────────────────────────
+// ── SETTINGS TAB ──────────────────────────────────────────────────────────────
+function renderSettings() {
+  const el = document.getElementById('panel-main');
+  const links = appConfig.pinned_links || [];
+  const parsers = appConfig.parsers || {};
+
+  const linksHtml = links.map((lnk, i) => renderPinnedLinkRow(lnk, i, links.length)).join('');
+  const parsersHtml = Object.entries(parsers).map(([id, cfg]) => renderParserRow(id, cfg)).join('');
+
+  el.innerHTML = `
+    <div class="settings-section">
+      <div class="sect-hdr">
+        <h2>📌 Закреплённые ссылки</h2>
+      </div>
+      <div id="pl-list">${linksHtml}</div>
+      <button class="add-cat-btn" style="margin-top:4px" onclick="addPinnedLink()">+ Добавить ссылку</button>
+    </div>
+    <div class="settings-section">
+      <div class="sect-hdr">
+        <h2>🔌 Парсеры</h2>
+      </div>
+      ${parsersHtml || '<div style="color:var(--tx3);font-size:13px">Парсеры не настроены</div>'}
+    </div>`;
+  updateParserStatus();
+}
+
+function renderPinnedLinkRow(lnk, i, total) {
+  return `<div class="pl-row" id="pl-${i}">
+    <div class="pl-fields">
+      <div class="pl-row-top">
+        <select class="pl-type-sel" onchange="setPLField(${i},'type',this.value)">
+          <option value="link" ${lnk.type==='link'?'selected':''}>🔗 Ссылка</option>
+          <option value="steam" ${lnk.type==='steam'?'selected':''}>🎮 Steam</option>
+        </select>
+        <input class="pl-inp" value="${esc(lnk.label||'')}" placeholder="Название" onchange="setPLField(${i},'label',this.value)">
+        ${lnk.type!=='steam' ? `<input class="pl-inp" style="font-size:22px;width:52px;flex:0" value="${esc(lnk.icon||'')}" placeholder="🔗" onchange="setPLField(${i},'icon',this.value)">` : ''}
+      </div>
+      <div class="pl-row-bottom">
+        <input class="pl-inp" value="${esc(lnk.url||'')}" placeholder="https://…" onchange="setPLField(${i},'url',this.value)">
+        <input class="pl-inp" value="${esc(lnk.note||'')}" placeholder="Заметка (необязательно)" onchange="setPLField(${i},'note',this.value)">
+      </div>
+      <div class="pl-row-actions">
+        <div class="pl-move">
+          <button class="tbtn sm" onclick="movePL(${i},-1)" ${i===0?'disabled':''}>↑</button>
+          <button class="tbtn sm" onclick="movePL(${i},1)" ${i===total-1?'disabled':''}>↓</button>
+        </div>
+        <button class="tbtn sm danger" onclick="deletePL(${i})">Удалить</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderParserRow(id, cfg) {
+  const labels = { steam: '🎮 Steam' };
+  return `<div class="parser-row">
+    <div>
+      <div class="parser-name">${labels[id] || id}</div>
+      <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
+        <input class="parser-url-inp" value="${esc(cfg.profile_url||cfg.wishlist_url||'')}"
+          placeholder="URL профиля или вишлиста"
+          onchange="setParserField('${id}','profile_url',this.value)" style="max-width:360px">
+        <button class="tbtn sm" onclick="triggerParserRefresh('${id}')">🔄 Обновить</button>
+      </div>
+    </div>
+    <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <div class="parser-enabled">
+        <span>Включён</span>
+        <button class="toggle ${cfg.enabled?'on':''}" id="toggle-${id}" onclick="toggleParser('${id}')"></button>
+      </div>
+      <div class="parser-meta" id="pstat-${id}">—</div>
+    </div>
+  </div>`;
+}
+
+function setPLField(i, field, val) {
+  if (!appConfig.pinned_links) appConfig.pinned_links = [];
+  appConfig.pinned_links[i][field] = val;
+  renderSettings();
+}
+function movePL(i, dir) {
+  const arr = appConfig.pinned_links;
+  const ni = i + dir;
+  if (ni < 0 || ni >= arr.length) return;
+  [arr[i], arr[ni]] = [arr[ni], arr[i]];
+  renderSettings();
+}
+function deletePL(i) {
+  appConfig.pinned_links.splice(i, 1);
+  renderSettings();
+}
+function addPinnedLink() {
+  if (!appConfig.pinned_links) appConfig.pinned_links = [];
+  appConfig.pinned_links.push({ id:'lnk_'+Date.now(), type:'link', label:'', url:'', note:'' });
+  renderSettings();
+}
+function setParserField(id, field, val) {
+  if (!appConfig.parsers) appConfig.parsers = {};
+  if (!appConfig.parsers[id]) appConfig.parsers[id] = {};
+  appConfig.parsers[id][field] = val;
+}
+function toggleParser(id) {
+  if (!appConfig.parsers?.[id]) return;
+  appConfig.parsers[id].enabled = !appConfig.parsers[id].enabled;
+  document.getElementById('toggle-'+id)?.classList.toggle('on', appConfig.parsers[id].enabled);
+}
+
+async function triggerParserRefresh(id) {
+  const stat = document.getElementById('pstat-'+id);
+  if (stat) stat.textContent = 'Загружаем…';
+  try {
+    const r = await fetch(`/api/admin/parsers/${id}/refresh`, { method:'POST', headers:{'x-admin-token':TOKEN} });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || r.status);
+    showToast(`✓ ${data.count} игр загружено`);
+    if (stat) stat.textContent = `${data.count} игр`;
+  } catch(e) {
+    showToast('Ошибка: ' + e.message);
+    if (stat) stat.textContent = 'Ошибка';
+  }
+}
+
+// ── BOOKINGS ──────────────────────────────────────────────────────────────────
 async function renderBookings() {
   const el = document.getElementById('panel-main');
   el.innerHTML = '<div class="panel-empty">Загрузка…</div>';
@@ -376,20 +658,11 @@ async function renderBookings() {
     ]);
     const bookings = await bkRes.json();
     const cfg = await cfgRes.json();
-
-    // Build id→name+cat map
     const itemMap = {};
     for (const cat of cfg.wishlist) {
-      for (const item of cat.items) {
-        itemMap[item.id] = { name: item.name, cat: cat.title };
-      }
+      for (const item of cat.items) itemMap[item.id] = { name: item.name, cat: cat.title };
     }
-
-    if (!bookings.length) {
-      el.innerHTML = '<div class="bk-empty">Броней пока нет</div>';
-      return;
-    }
-
+    if (!bookings.length) { el.innerHTML = '<div class="bk-empty">Броней пока нет</div>'; return; }
     const rows = bookings.map(b => {
       const info = itemMap[b.item_id] || { name: b.item_id, cat: '?' };
       const date = new Date(b.booked_at * 1000).toLocaleDateString('ru');
@@ -397,10 +670,9 @@ async function renderBookings() {
         <td><div class="bk-item-name">${esc(info.name)}</div><div class="bk-item-cat">${esc(info.cat)}</div></td>
         <td class="bk-user">${b.username ? '@'+esc(b.username) : esc(b.first_name)}</td>
         <td style="color:var(--tx3)">${date}</td>
-        <td><button class="bk-del" onclick="deleteBk('${b.item_id}')" title="Снять бронь">✕</button></td>
+        <td><button class="bk-del" onclick="deleteBk('${b.item_id}')">✕</button></td>
       </tr>`;
     }).join('');
-
     el.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <span style="font-size:13px;color:var(--tx2)">${bookings.length} ${plural(bookings.length,'бронь','брони','броней')}</span>
@@ -410,44 +682,39 @@ async function renderBookings() {
         <thead><tr><th>Желание</th><th>Кто бронирует</th><th>Дата</th><th></th></tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
-  } catch (e) {
+  } catch(e) {
     el.innerHTML = `<div class="panel-empty" style="color:var(--red)">Ошибка: ${e.message}</div>`;
   }
 }
 
 async function deleteBk(itemId) {
   if (!confirm('Снять бронь?')) return;
-  await fetch(`/api/admin/bookings/${itemId}`, { method: 'DELETE', headers: { 'x-admin-token': TOKEN } });
-  showToast('Бронь снята');
-  renderBookings();
+  await fetch(`/api/admin/bookings/${itemId}`, { method:'DELETE', headers:{'x-admin-token':TOKEN} });
+  showToast('Бронь снята'); renderBookings();
 }
-
 async function deleteAllBk() {
-  if (!confirm('Снять ВСЕ брони? Это необратимо.')) return;
-  await fetch('/api/admin/bookings', { method: 'DELETE', headers: { 'x-admin-token': TOKEN } });
-  showToast('Все брони сняты');
-  renderBookings();
+  if (!confirm('Снять ВСЕ брони? Необратимо.')) return;
+  await fetch('/api/admin/bookings', { method:'DELETE', headers:{'x-admin-token':TOKEN} });
+  showToast('Все брони сняты'); renderBookings();
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 function plural(n, one, few, many) {
-  const m = n % 10, h = n % 100;
-  if (h >= 11 && h <= 19) return many;
-  if (m === 1) return one;
-  if (m >= 2 && m <= 4) return few;
+  const m=n%10, h=n%100;
+  if(h>=11&&h<=19) return many;
+  if(m===1) return one;
+  if(m>=2&&m<=4) return few;
   return many;
 }
-
 let toastT;
 function showToast(msg) {
   const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('on');
+  el.textContent=msg; el.classList.add('on');
   clearTimeout(toastT);
-  toastT = setTimeout(() => el.classList.remove('on'), 2400);
+  toastT = setTimeout(()=>el.classList.remove('on'), 2400);
 }
 </script>
 </body>

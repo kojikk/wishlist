@@ -5,6 +5,7 @@ const express  = require('express');
 const sqlite3  = require('sqlite3').verbose();
 const path     = require('path');
 const fs       = require('fs');
+const PARSERS  = require('./lib/parsers');
 
 const PORT        = process.env.PORT        || 3000;
 const DB_PATH     = process.env.DB_PATH     || path.join(__dirname, 'data', 'wishlist.db');
@@ -33,7 +34,49 @@ try {
   process.exit(1);
 }
 
-// ─── SSE hot-reload ───────────────────────────────────────────────────────────
+// ─── Parser cache ─────────────────────────────────────────────────────────────
+// Map<parserId, { cat: { id, emoji, title, items, _external }, fetchedAt }>
+const parserCache = new Map();
+const parserTimers = {};
+
+async function runParser(parserId, cfg) {
+  const parser = PARSERS[parserId];
+  if (!parser) throw new Error(`Unknown parser: ${parserId}`);
+  const items = await parser.fetch(cfg);
+  parserCache.set(parserId, {
+    cat: {
+      id: `__${parserId}__`,
+      emoji: cfg.category_emoji || parser.defaultEmoji || '📋',
+      title: cfg.category_title || parser.defaultTitle || parserId,
+      items,
+      _external: true,
+    },
+    fetchedAt: Date.now(),
+  });
+  console.log(`[parser:${parserId}] fetched ${items.length} items`);
+  broadcastReload();
+}
+
+function scheduleParser(parserId, cfg) {
+  clearTimeout(parserTimers[parserId]);
+  if (!cfg?.enabled) return;
+  runParser(parserId, cfg).catch(e => console.error(`[parser:${parserId}] error:`, e.message));
+  const ms = (cfg.refresh_hours || 6) * 3_600_000;
+  parserTimers[parserId] = setTimeout(() => scheduleParser(parserId, cfg), ms);
+}
+
+function scheduleParsers() {
+  try {
+    const { app } = loadConfig();
+    for (const [id, cfg] of Object.entries(app.parsers || {})) {
+      scheduleParser(id, cfg);
+    }
+  } catch (e) {
+    console.error('scheduleParsers:', e.message);
+  }
+}
+
+// ─── SSE ─────────────────────────────────────────────────────────────────────
 
 const sseClients = new Set();
 
@@ -43,19 +86,20 @@ function broadcastReload() {
   }
 }
 
-// Watch both config files
-[path.join(CONFIG_DIR, 'wishlist.json'), path.join(CONFIG_DIR, 'app.json')].forEach(f => {
+[
+  path.join(CONFIG_DIR, 'wishlist.json'),
+  path.join(CONFIG_DIR, 'app.json'),
+].forEach(f => {
   fs.watch(f, () => {
-    console.log(`Config changed: ${path.basename(f)} — broadcasting reload`);
-    setTimeout(broadcastReload, 80); // small debounce
+    console.log(`Config changed: ${path.basename(f)}`);
+    setTimeout(broadcastReload, 80);
   });
 });
 
-// Also watch public/index.html
 const indexPath = path.join(PUBLIC_DIR, 'index.html');
 if (fs.existsSync(indexPath)) {
   fs.watch(indexPath, () => {
-    console.log('index.html changed — broadcasting reload');
+    console.log('index.html changed');
     setTimeout(broadcastReload, 80);
   });
 }
@@ -83,7 +127,7 @@ const dbRun = (sql, p=[]) => new Promise((res,rej) => db.run(sql, p, function(e)
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 const app = express();
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '4mb' }));
 app.use(express.static(PUBLIC_DIR));
 
 function adminAuth(req, res, next) {
@@ -97,27 +141,29 @@ function adminAuth(req, res, next) {
 
 app.get('/api/reload-stream', (req, res) => {
   res.set({
-    'Content-Type':  'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection':    'keep-alive',
-    'X-Accel-Buffering': 'no', // disable nginx buffering
+    'Content-Type':      'text/event-stream',
+    'Cache-Control':     'no-cache',
+    'Connection':        'keep-alive',
+    'X-Accel-Buffering': 'no',
   });
   res.flushHeaders();
   res.write(': connected\n\n');
-
-  const keepalive = setInterval(() => {
-    try { res.write(': ping\n\n'); } catch {}
-  }, 25000);
-
+  const ka = setInterval(() => { try { res.write(': ping\n\n'); } catch {} }, 25000);
   sseClients.add(res);
-  req.on('close', () => { sseClients.delete(res); clearInterval(keepalive); });
+  req.on('close', () => { sseClients.delete(res); clearInterval(ka); });
 });
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
 app.get('/api/config', (req, res) => {
-  try { res.json(loadConfig()); }
-  catch (e) { console.error('Config read error:', e); res.status(500).json({ error: 'Failed to load config' }); }
+  try {
+    const cfg = loadConfig();
+    const externalCats = [...parserCache.values()].map(c => c.cat);
+    res.json({ wishlist: [...cfg.wishlist, ...externalCats], app: cfg.app });
+  } catch (e) {
+    console.error('Config read error:', e);
+    res.status(500).json({ error: 'Failed to load config' });
+  }
 });
 
 app.get('/api/bookings', async (req, res) => {
@@ -149,7 +195,7 @@ app.post('/api/unbook', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─── Admin API ────────────────────────────────────────────────────────────────
+// ─── Admin: bookings ─────────────────────────────────────────────────────────
 
 app.get('/api/admin/bookings', adminAuth, async (req, res) => {
   res.json(await dbAll('SELECT * FROM bookings ORDER BY booked_at DESC'));
@@ -165,13 +211,13 @@ app.delete('/api/admin/bookings', adminAuth, async (req, res) => {
   res.json({ success: true });
 });
 
-// Get wishlist for admin editor
+// ─── Admin: wishlist ─────────────────────────────────────────────────────────
+
 app.get('/api/admin/wishlist', adminAuth, (req, res) => {
   try { res.json(loadConfig().wishlist); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Save wishlist from admin editor
 app.put('/api/admin/wishlist', adminAuth, (req, res) => {
   try {
     fs.writeFileSync(path.join(CONFIG_DIR, 'wishlist.json'), JSON.stringify(req.body, null, 2), 'utf8');
@@ -179,22 +225,48 @@ app.put('/api/admin/wishlist', adminAuth, (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Get app config for admin editor
+// ─── Admin: app config ───────────────────────────────────────────────────────
+
 app.get('/api/admin/app-config', adminAuth, (req, res) => {
   try { res.json(loadConfig().app); }
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Save app config from admin editor
 app.put('/api/admin/app-config', adminAuth, (req, res) => {
   try {
     fs.writeFileSync(path.join(CONFIG_DIR, 'app.json'), JSON.stringify(req.body, null, 2), 'utf8');
+    scheduleParsers();
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─── Admin UI ─────────────────────────────────────────────────────────────────
-// Served separately — no static middleware, only via this route after token check
+// ─── Admin: parsers ───────────────────────────────────────────────────────────
+
+app.get('/api/admin/parsers', adminAuth, (req, res) => {
+  const { app: appCfg } = loadConfig();
+  const result = {};
+  for (const [id, cfg] of Object.entries(appCfg.parsers || {})) {
+    const cached = parserCache.get(id);
+    result[id] = {
+      enabled: cfg.enabled,
+      itemCount: cached?.cat?.items?.length ?? null,
+      fetchedAt: cached?.fetchedAt ?? null,
+    };
+  }
+  res.json(result);
+});
+
+app.post('/api/admin/parsers/:id/refresh', adminAuth, async (req, res) => {
+  const { app: appCfg } = loadConfig();
+  const cfg = appCfg.parsers?.[req.params.id];
+  if (!cfg) return res.status(404).json({ error: 'Parser not found in config' });
+  try {
+    await runParser(req.params.id, cfg);
+    res.json({ success: true, count: parserCache.get(req.params.id)?.cat?.items?.length ?? 0 });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── Admin UI ────────────────────────────────────────────────────────────────
 
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'admin.html'));
@@ -204,7 +276,7 @@ app.get('/admin', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Wishlist running on :${PORT}`);
-  if (!ADMIN_TOKEN || ADMIN_TOKEN === 'change_me_please') {
+  if (!ADMIN_TOKEN || ADMIN_TOKEN === 'change_me_please')
     console.warn('⚠️  ADMIN_TOKEN not set — admin endpoints disabled');
-  }
+  scheduleParsers();
 });

@@ -34,31 +34,27 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
   scrollbar-width:none;
 }
 .sidebar::-webkit-scrollbar{display:none}
-
 .sb-top{padding:22px 16px 16px;border-bottom:1px solid var(--br)}
 .sb-logo{font-family:'Unbounded',sans-serif;font-size:17px;font-weight:700;letter-spacing:-.5px;margin-bottom:12px}
 .sb-logo em{color:var(--ac);font-style:normal}
 .sb-counters{display:flex;gap:6px;flex-wrap:wrap}
 .sb-pill{font-size:11px;font-weight:500;padding:3px 9px;border-radius:99px;background:var(--sf2);color:var(--tx2);border:1px solid var(--br);transition:all .25s}
 .sb-pill.gn{background:var(--gdim);color:var(--gn);border-color:var(--gbr)}
-
-.sb-nav{flex:1;padding:8px 8px;overflow-y:auto;scrollbar-width:none}
+.sb-nav{flex:1;padding:8px;overflow-y:auto;scrollbar-width:none}
 .sb-nav::-webkit-scrollbar{display:none}
 .nav-item{
   display:flex;align-items:center;gap:8px;
   padding:7px 10px;border-radius:8px;cursor:pointer;
   color:var(--tx2);font-size:13px;text-decoration:none;
-  transition:background .14s,color .14s;
-  user-select:none;
+  transition:background .14s,color .14s;user-select:none;
 }
 .nav-item:hover{background:var(--sf2);color:var(--tx)}
-.nav-item.active{background:var(--adim);color:var(--ac)}
+.nav-item.on{background:var(--adim);color:var(--ac)}
 .nav-em{font-size:15px;width:20px;text-align:center;flex-shrink:0}
 .nav-lbl{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nav-cnt{font-size:10px;color:var(--tx3);flex-shrink:0;transition:color .25s}
-.nav-item.active .nav-cnt{color:rgba(232,200,74,.45)}
+.nav-cnt{font-size:10px;color:var(--tx3);flex-shrink:0}
+.nav-item.on .nav-cnt{color:rgba(232,200,74,.45)}
 .nav-item .nav-cnt.bc{color:var(--gn);opacity:.8}
-
 .sb-foot{padding:12px 16px;border-top:1px solid var(--br)}
 .eye-btn{
   display:flex;align-items:center;gap:7px;
@@ -80,18 +76,13 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
   background:linear-gradient(to bottom,var(--bg) 70%,transparent);
   pointer-events:none;
 }
-.search-float-inner{
-  max-width:640px;position:relative;pointer-events:all;
-  filter:drop-shadow(0 2px 12px rgba(0,0,0,.5));
-}
+.search-float-inner{max-width:640px;position:relative;pointer-events:all}
 .search-input{
   width:100%;background:var(--sf);
-  border:1px solid var(--br2);
-  border-radius:99px;
+  border:1px solid var(--br2);border-radius:99px;
   padding:10px 16px 10px 38px;
   font-family:'Onest',sans-serif;font-size:14px;color:var(--tx);
   outline:none;transition:border-color .2s,box-shadow .2s;
-  backdrop-filter:blur(10px);
 }
 .search-input::placeholder{color:var(--tx3)}
 .search-input:focus{border-color:rgba(255,255,255,.2);box-shadow:0 0 0 3px rgba(232,200,74,.07)}
@@ -99,10 +90,9 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 
 /* ═══ MOBILE HEADER ═══ */
 .mob-hdr{
-  display:none;
-  position:sticky;top:0;z-index:100;
+  display:none;position:sticky;top:0;z-index:100;
   background:var(--bg);border-bottom:1px solid var(--br);
-  padding:13px 16px 8px;
+  padding:13px 16px 10px;
 }
 .mob-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .mob-logo{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.5px}
@@ -110,12 +100,11 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .mob-eye{background:var(--sf);border:1px solid var(--br);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:.18s}
 .mob-eye.on{background:var(--adim);border-color:var(--abr)}
 .mob-pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
-.mob-search{position:relative;margin-bottom:2px}
+.mob-search{position:relative}
 .mob-search input{width:100%;background:var(--sf);border:1px solid var(--br);border-radius:99px;padding:8px 14px 8px 34px;font-family:'Onest',sans-serif;font-size:14px;color:var(--tx);outline:none;transition:.2s}
 .mob-search input::placeholder{color:var(--tx3)}
 .mob-search input:focus{border-color:var(--br2)}
 .mob-search .search-ic{left:11px}
-
 .mob-cats{display:none;gap:7px;padding:8px 16px 6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--br)}
 .mob-cats::-webkit-scrollbar{display:none}
 .cat-chip{flex-shrink:0;font-size:12px;font-weight:500;padding:5px 12px;border-radius:99px;border:1px solid var(--br);background:var(--sf);color:var(--tx2);cursor:pointer;transition:all .15s;white-space:nowrap}
@@ -126,13 +115,14 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 
 /* ═══ TOP CARDS ═══ */
 .top-cards{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+
+/* Steam pinned link */
 .steam-card{
   display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;
   background:linear-gradient(135deg,#1b2838,#243447);
-  border:1px solid rgba(102,192,244,.15);
-  border-radius:var(--r);padding:13px 15px;
+  border:1px solid rgba(102,192,244,.15);border-radius:var(--r);padding:13px 15px;
   transition:border-color .18s,transform .1s;
-  animation:fadeUp .3s ease both;
+  opacity:0;animation:fadeUp .3s ease both;
 }
 .steam-card:hover{border-color:rgba(102,192,244,.35);transform:translateY(-1px)}
 .steam-card:active{transform:scale(.99)}
@@ -142,15 +132,28 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .steam-arr{margin-left:auto;color:rgba(102,192,244,.4);font-size:14px;transition:transform .18s}
 .steam-card:hover .steam-arr{transform:translateX(3px)}
 
+/* Generic pinned link */
+.pinned-link{
+  display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;
+  background:var(--sf);border:1px solid var(--br2);border-radius:var(--r);padding:13px 15px;
+  transition:border-color .18s,transform .1s;
+  opacity:0;animation:fadeUp .3s ease both;
+}
+.pinned-link:hover{border-color:var(--br2);transform:translateY(-1px);background:var(--sf2)}
+.pinned-link:active{transform:scale(.99)}
+.pl-icon{width:34px;height:34px;flex-shrink:0;background:var(--sf3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.pl-name{font-size:13px;font-weight:500;color:var(--tx)}
+.pl-sub{font-size:12px;color:var(--tx2);margin-top:1px}
+.pl-arr{margin-left:auto;color:var(--tx3);font-size:14px;transition:transform .18s}
+.pinned-link:hover .pl-arr{transform:translateX(3px)}
+
 /* info card styles */
 .info-card{
   display:flex;gap:12px;align-items:flex-start;
   border-radius:var(--r);padding:13px 15px;
   border:1px solid var(--br);
-  animation:fadeUp .35s ease both;
-  transition:transform .15s;
+  opacity:0;animation:fadeUp .35s ease both;
 }
-.info-card:hover{transform:translateY(-1px)}
 .info-card.accent{background:var(--adim);border-color:var(--abr)}
 .info-card.default{background:var(--sf)}
 .info-card.blue{background:var(--bdim);border-color:var(--bbr)}
@@ -165,7 +168,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 /* ═══ SECTION ═══ */
 .section{margin-bottom:24px;opacity:0;transform:translateY(10px);animation:fadeUp .35s ease forwards}
 @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
-
 .sec-head{display:flex;align-items:center;gap:9px;margin-bottom:8px;cursor:pointer;user-select:none;padding:4px 2px;border-radius:8px;transition:background .14s}
 .sec-head:hover{background:rgba(255,255,255,.025)}
 .sec-emoji{width:31px;height:31px;border-radius:8px;background:var(--sf);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:transform .2s}
@@ -179,22 +181,21 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .sec-arr{font-size:9px;color:var(--tx3);transition:transform .22s ease;flex-shrink:0}
 .sec-arr.op{transform:rotate(90deg)}
 
+.items-list{display:flex;flex-direction:column;gap:5px;overflow:hidden;max-height:0;transition:max-height .38s cubic-bezier(.4,0,.2,1)}
+.items-list.op{max-height:6000px}
+
+/* cat media inside items-list */
 .cat-media{display:flex;gap:6px;margin-bottom:8px;overflow-x:auto;scrollbar-width:none}
 .cat-media::-webkit-scrollbar{display:none}
 .cat-img{width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--br);flex-shrink:0;cursor:pointer;transition:transform .15s,border-color .15s}
 .cat-img:hover{transform:scale(1.05);border-color:var(--br2)}
 
-.items-list{display:flex;flex-direction:column;gap:5px;overflow:hidden;max-height:0;transition:max-height .38s cubic-bezier(.4,0,.2,1)}
-.items-list.op{max-height:4000px}
-
 /* ═══ ITEM CARD ═══ */
 .item-card{
   background:var(--sf);border:1px solid var(--br);border-radius:var(--r);
   padding:11px 14px;cursor:pointer;position:relative;overflow:hidden;
-  transition:background .15s,border-color .15s,transform .12s,box-shadow .15s;
-  animation:cardIn .25s ease both;
-  touch-action:pan-y;
-  user-select:none;
+  transition:background .15s,border-color .15s,transform .12s;
+  animation:cardIn .25s ease both;touch-action:pan-y;user-select:none;
 }
 @keyframes cardIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .item-card:hover{background:var(--sf2);border-color:var(--br2)}
@@ -204,13 +205,11 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .item-card.mine{background:var(--adim);border-color:var(--abr)}
 .item-card.mine:hover{background:rgba(232,200,74,.14)}
 
-/* swipe hint layer */
 .swipe-hint{
   position:absolute;inset:0;border-radius:var(--r);
   display:flex;align-items:center;padding:0 18px;
   opacity:0;transition:opacity .1s;pointer-events:none;
-  font-size:13px;font-weight:500;
-  will-change:opacity;
+  font-size:13px;font-weight:500;will-change:opacity;
 }
 .swipe-hint.right{background:linear-gradient(90deg,rgba(74,222,128,.2) 0%,transparent 80%);color:var(--gn);justify-content:flex-start}
 .swipe-hint.left{background:linear-gradient(270deg,rgba(248,113,113,.2) 0%,transparent 80%);color:var(--red);justify-content:flex-end}
@@ -233,7 +232,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .item-booker{font-size:11px;color:var(--tx3)}
 .item-booker a{color:var(--gn);font-weight:500;text-decoration:none}
 .item-card.mine .item-booker a{color:var(--ac)}
-
 .item-links{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
 .ilink{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--sf3);color:var(--tx2);border:1px solid var(--br2);text-decoration:none;transition:.15s;display:inline-flex;align-items:center;gap:4px}
 .ilink:hover{background:rgba(255,255,255,.06);color:var(--tx)}
@@ -243,7 +241,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .thumb-more{width:60px;height:48px;border-radius:7px;border:1px solid var(--br);background:var(--sf3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tx3);cursor:pointer;transition:.15s}
 .thumb-more:hover{background:var(--sf2);color:var(--tx2)}
 
-/* book pop animation */
 @keyframes bookPop{0%{transform:scale(1)}40%{transform:scale(1.03)}70%{transform:scale(.985)}100%{transform:scale(1)}}
 .item-card.pop{animation:bookPop .35s ease}
 
@@ -277,8 +274,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .s-mine{background:var(--adim);color:var(--ac);border:1px solid var(--abr)}
 .m-media{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
 .m-media::-webkit-scrollbar{display:none}
-.m-media img{height:88px;width:auto;object-fit:cover;border-radius:8px;border:1px solid var(--br);cursor:pointer;flex-shrink:0;transition:.15s}
-.m-media img:hover{border-color:var(--br2)}
+.m-media img{height:88px;width:auto;object-fit:cover;border-radius:8px;border:1px solid var(--br);cursor:pointer;flex-shrink:0}
 .m-links{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .mlink{font-size:12px;padding:5px 12px;border-radius:99px;background:var(--sf3);color:var(--tx2);border:1px solid var(--br2);text-decoration:none;transition:.15s;display:inline-flex;align-items:center;gap:5px}
 .mlink:hover{background:rgba(255,255,255,.06);color:var(--tx)}
@@ -290,7 +286,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 /* ═══ SKELETON ═══ */
 .skel{background:var(--sf);border-radius:var(--r);animation:sk 1.4s infinite}
 @keyframes sk{0%,100%{opacity:.35}50%{opacity:.7}}
-.skel-wrap{display:flex;flex-direction:column;gap:10px;padding:20px 28px}
+.skel-wrap{display:flex;flex-direction:column;gap:10px;padding:20px 0}
 
 /* ═══ MISC ═══ */
 .empty{text-align:center;padding:60px 20px;color:var(--tx3);font-size:14px;display:none}
@@ -315,13 +311,10 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 <body>
 <div class="app">
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sb-top">
     <div class="sb-logo">Вишлист <em>✦</em></div>
-    <div class="sb-counters" id="sb-counters">
-      <span class="sb-pill">…</span>
-    </div>
+    <div class="sb-counters" id="sb-counters"><span class="sb-pill">…</span></div>
   </div>
   <nav class="sb-nav" id="sb-nav"></nav>
   <div class="sb-foot">
@@ -331,10 +324,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
   </div>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
-
-  <!-- MOBILE HEADER -->
   <div class="mob-hdr">
     <div class="mob-top">
       <div class="mob-logo">Вишлист <em>✦</em></div>
@@ -348,7 +338,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
   </div>
   <div class="mob-cats" id="mob-cats"></div>
 
-  <!-- FLOATING SEARCH (desktop) -->
   <div class="search-float">
     <div class="search-float-inner">
       <svg class="search-ic" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="white" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -356,7 +345,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
     </div>
   </div>
 
-  <!-- CONTENT -->
   <div class="content" id="content">
     <div class="skel-wrap">
       <div class="skel" style="height:52px"></div>
@@ -366,11 +354,9 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
     </div>
   </div>
   <div class="empty" id="empty">🔍 Ничего не найдено</div>
-
 </main>
 </div>
 
-<!-- LIGHTBOX -->
 <div class="lb" id="lb" onclick="lbOut(event)">
   <span class="lb-x" onclick="lbClose()">✕</span>
   <span class="lb-p" onclick="lbNav(-1)">‹</span>
@@ -379,7 +365,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
   <div class="lb-c" id="lb-c"></div>
 </div>
 
-<!-- MODAL -->
 <div class="ov" id="ov" onclick="closeModal()"></div>
 <div class="sheet" id="sheet">
   <div class="handle"></div>
@@ -395,12 +380,8 @@ const tg = window.Telegram?.WebApp;
 if (tg) { tg.expand(); tg.setHeaderColor('#0f0f0f'); tg.setBackgroundColor('#0f0f0f'); tg.ready(); }
 const tgUser = tg?.initDataUnsafe?.user || { id:'dev', first_name:'Dev', username:'dev' };
 
-function haptic(type='light') {
-  try { tg?.HapticFeedback?.impactOccurred(type); } catch {}
-}
-function hapticNotif(type='success') {
-  try { tg?.HapticFeedback?.notificationOccurred(type); } catch {}
-}
+function haptic(type='light') { try { tg?.HapticFeedback?.impactOccurred(type); } catch {} }
+function hapticNotif(type='success') { try { tg?.HapticFeedback?.notificationOccurred(type); } catch {} }
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let WISHLIST=[], CFG={}, bookings={};
@@ -426,7 +407,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight') lbNav(1);
 });
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────────────────────
 async function init(){
   try {
     const [cr,br] = await Promise.all([fetch('/api/config'), fetch('/api/bookings')]);
@@ -442,12 +423,35 @@ async function init(){
     document.getElementById('content').innerHTML=`<div style="padding:24px;color:var(--tx2);font-size:13px;line-height:1.6">
       <div style="font-size:26px;margin-bottom:10px">⚠️</div>
       <b style="color:var(--tx)">Не удалось загрузить</b><br>
-      <code style="font-size:11px;background:var(--sf);padding:6px 10px;border-radius:6px;display:inline-block;margin-top:8px;word-break:break-all">${e.message}</code><br>
-      <span style="margin-top:8px;display:block">docker logs tg-wishlist</span></div>`;
+      <code style="font-size:11px;background:var(--sf);padding:6px 10px;border-radius:6px;display:inline-block;margin-top:8px;word-break:break-all">${e.message}</code></div>`;
   }
 }
 
-// ── RENDER SIDEBAR ────────────────────────────────────────────────────────────
+async function refreshConfig(){
+  try {
+    const [cr,br] = await Promise.all([fetch('/api/config'), fetch('/api/bookings')]);
+    if(!cr.ok) return;
+    const cfg = await cr.json();
+    WISHLIST=cfg.wishlist||[]; CFG=cfg.app||{};
+    bookings=br.ok ? await br.json() : bookings;
+    // preserve open sections for new categories
+    WISHLIST.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
+    renderSidebar(); renderMobCats(); renderStats();
+    if(!document.getElementById('ov').classList.contains('on')) renderContent();
+  } catch {}
+}
+
+// ── SSE hot-reload ────────────────────────────────────────────────────────────
+(function(){
+  function connect(){
+    const es = new EventSource('/api/reload-stream');
+    es.onmessage = e => { if(e.data==='reload') refreshConfig(); };
+    es.onerror = () => { es.close(); setTimeout(connect, 5000); };
+  }
+  connect();
+})();
+
+// ── SIDEBAR ──────────────────────────────────────────────────────────────────
 function renderSidebar(){
   const nav=document.getElementById('sb-nav');
   const all=[{id:'all',emoji:'✦',title:'Все',items:WISHLIST.flatMap(c=>c.items)},...WISHLIST];
@@ -470,7 +474,6 @@ function renderStats(){
   document.getElementById('mob-pills').innerHTML=html;
 }
 
-// ── MOBILE CATS ───────────────────────────────────────────────────────────────
 function renderMobCats(){
   document.getElementById('mob-cats').innerHTML=
     [{id:'all',emoji:'✦',title:'Все'},...WISHLIST]
@@ -480,7 +483,30 @@ function renderMobCats(){
 
 function setCat(id){ activeCat=id; renderSidebar(); renderMobCats(); renderContent(); haptic(); }
 
-// ── RENDER CONTENT ────────────────────────────────────────────────────────────
+// ── PINNED LINKS ──────────────────────────────────────────────────────────────
+function renderPinnedLink(link, delay){
+  const anim = `animation-delay:${delay*60}ms`;
+  if(link.type==='steam'){
+    return `<a class="steam-card" href="${link.url}" target="_blank" style="${anim}">
+      <div class="steam-logo"><img src="/media/icons/steam_logo_icon.svg" width="24" height="24"></div>
+      <div>
+        <div class="steam-name">${link.label||'Steam'}</div>
+        ${link.note?`<div class="steam-sub">${link.note}</div>`:''}
+      </div>
+      <div class="steam-arr">→</div>
+    </a>`;
+  }
+  return `<a class="pinned-link" href="${link.url}" target="_blank" style="${anim}">
+    ${link.icon?`<div class="pl-icon">${link.icon}</div>`:''}
+    <div>
+      <div class="pl-name">${link.label}</div>
+      ${link.note?`<div class="pl-sub">${link.note}</div>`:''}
+    </div>
+    <div class="pl-arr">→</div>
+  </a>`;
+}
+
+// ── CONTENT ───────────────────────────────────────────────────────────────────
 function renderContent(){
   const el=document.getElementById('content');
   const emp=document.getElementById('empty');
@@ -494,40 +520,35 @@ function renderContent(){
   if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
   emp.style.display='none';
 
-  let top='';
-  if(!q && activeCat==='all'){
-    const s=CFG.steam;
-    if(s?.enabled){
-      top+=`<a class="steam-card" href="${s.wishlist_url}" target="_blank">
-        <div class="steam-logo"><img src="media/icons/steam_logo_icon.svg" width="24px" height="24px"></div>
-        <div><div class="steam-name">Вишлист в Steam</div><div class="steam-sub">${s.note||''}</div></div>
-        <div class="steam-arr">→</div>
-      </a>`;
-    }
-    const cards=CFG.info_cards||[];
-    if(cards.length){
-      top+=`<div class="top-cards">`+cards.map((card,ci)=>{
-        const contacts=(card.contacts||[]).map(c=>`<a href="https://t.me/${c.username}" class="ic-chip">${c.label}</a>`).join('');
-        return `<div class="info-card ${card.style||'default'}" style="animation-delay:${(ci+1)*60}ms">
-          <span class="ic-icon">${card.icon||'ℹ️'}</span>
-          <div>
-            <div class="ic-title">${card.title||''}</div>
-            <div class="ic-text">${card.text||''}</div>
-            ${contacts?`<div class="ic-contacts">${contacts}</div>`:''}
-          </div>
-        </div>`;
-      }).join('')+`</div>`;
-    }
+  let topHtml='';
+  if(!q&&activeCat==='all'){
+    const parts=[];
+    (CFG.pinned_links||[]).forEach((lnk,i)=>parts.push(renderPinnedLink(lnk,i)));
+    (CFG.info_cards||[]).forEach((card,i)=>{
+      const n=parts.length;
+      const contacts=(card.contacts||[]).map(c=>`<a href="https://t.me/${c.username}" class="ic-chip">${c.label}</a>`).join('');
+      parts.push(`<div class="info-card ${card.style||'default'}" style="animation-delay:${n*60}ms">
+        <span class="ic-icon">${card.icon||'ℹ️'}</span>
+        <div>
+          <div class="ic-title">${card.title||''}</div>
+          <div class="ic-text">${card.text||''}</div>
+          ${contacts?`<div class="ic-contacts">${contacts}</div>`:''}
+        </div>
+      </div>`);
+    });
+    if(parts.length) topHtml=`<div class="top-cards">${parts.join('')}</div>`;
   }
 
-  const secs=filtered.map((cat,ci)=>{
+  const secsHtml=filtered.map((cat,ci)=>{
     const isOpen=openSecs.has(cat.id);
     const bc=cat.items.filter(i=>bookings[i.id]).length;
-    const catMedia=(cat.media||[]);
-    const catMediaHtml=catMedia.length&&isOpen?`<div class="cat-media">${
-      catMedia.map((m,mi)=>`<img class="cat-img" src="../media/${m}" loading="lazy"
-        onclick="lbOpen(${JSON.stringify(catMedia.map(x=>'../media/'+x))},${mi})" alt="">`)
-      .join('')}</div>`:'' ;
+    const catMedia=cat.media||[];
+    const catMediaHtml=catMedia.length
+      ?`<div class="cat-media">${catMedia.map((m,mi)=>
+          `<img class="cat-img" src="/media/${m}" loading="lazy"
+            onclick="lbOpen(${JSON.stringify(catMedia.map(x=>'/media/'+x))},${mi})" alt="">`
+        ).join('')}</div>`
+      :'';
     return `<div class="section" style="animation-delay:${ci*48}ms" id="sec-${cat.id}">
       <div class="sec-head" onclick="toggleSec('${cat.id}')">
         <div class="sec-emoji">${cat.emoji}</div>
@@ -538,14 +559,14 @@ function renderContent(){
         </div>
         <div class="sec-arr ${isOpen?'op':''}" id="arr-${cat.id}">▶</div>
       </div>
-      ${catMediaHtml}
       <div class="items-list ${isOpen?'op':''}" id="il-${cat.id}">
+        ${catMediaHtml}
         ${cat.items.map((item,ii)=>renderItem(item,ii)).join('')}
       </div>
     </div>`;
   }).join('');
 
-  el.innerHTML=top+secs;
+  el.innerHTML=topHtml+secsHtml;
   attachSwipes();
 }
 
@@ -553,31 +574,27 @@ function renderItem(item,delay){
   const bk=bookings[item.id];
   const mine=bk&&String(bk.id)===String(tgUser.id);
   const cls=bk?(mine?'mine':'booked'):'';
-
   let bookerHtml='';
   if(bk&&!mine){
     bookerHtml=reveal&&bk.username
       ?`<div class="item-booker">Бронь: <a href="https://t.me/${bk.username}" target="_blank">@${bk.username}</a></div>`
       :`<div class="item-booker">Уже забронировано ✦</div>`;
   }
-
   const links=item.links||[];
   const linksHtml=links.length?`<div class="item-links">${links.slice(0,3).map(l=>
     `<a class="ilink" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
       <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      ${l.label}</a>`).join('')}</div>`:'' ;
-
+      ${l.label}</a>`).join('')}</div>`:'';
   const media=item.media||[];
   let mediaHtml='';
   if(media.length){
     const show=media.slice(0,3), rest=media.length-3;
-    const allU=JSON.stringify(media.map(m=>'../media/'+m));
+    const allU=JSON.stringify(media.map(m=>'/media/'+m));
     mediaHtml=`<div class="item-thumbs" onclick="event.stopPropagation()">`+
-      show.map((m,i)=>`<img class="thumb" src="../media/${m}" loading="lazy" onclick="lbOpen(${allU},${i})" alt="">`).join('')+
+      show.map((m,i)=>`<img class="thumb" src="/media/${m}" loading="lazy" onclick="lbOpen(${allU},${i})" alt="">`).join('')+
       (rest>0?`<div class="thumb-more" onclick="lbOpen(${allU},3)">+${rest}</div>`:'')+
       `</div>`;
   }
-
   return `<div class="item-card ${cls}" id="ic-${item.id}" data-id="${item.id}" onclick="openModal('${item.id}')" style="animation-delay:${delay*28}ms">
     <div class="item-inner">
       <div class="dot"></div>
@@ -598,61 +615,37 @@ function renderItem(item,delay){
 // ── SWIPE ─────────────────────────────────────────────────────────────────────
 function attachSwipes(){
   document.querySelectorAll('.item-card').forEach(card=>{
-    let startX=0, startY=0, dx=0;
-    let dragging=false, cancelled=false, hintsInjected=false;
+    let startX=0,startY=0,dx=0,dragging=false,cancelled=false,hintsInjected=false;
     const id=card.dataset.id;
-    let hintR=null, hintL=null;
-
+    let hintR=null,hintL=null;
     function injectHints(){
-      if(hintsInjected) return;
-      hintsInjected=true;
-      const bk=bookings[id];
-      const mine=bk&&String(bk.id)===String(tgUser.id);
-      if(!bk){
-        hintR=document.createElement('div');
-        hintR.className='swipe-hint right';
-        hintR.textContent='✓ Забронировать';
-        card.prepend(hintR);
-      }
-      if(mine){
-        hintL=document.createElement('div');
-        hintL.className='swipe-hint left';
-        hintL.textContent='✕ Снять бронь';
-        card.prepend(hintL);
-      }
+      if(hintsInjected) return; hintsInjected=true;
+      const bk=bookings[id]; const mine=bk&&String(bk.id)===String(tgUser.id);
+      if(!bk){ hintR=document.createElement('div'); hintR.className='swipe-hint right'; hintR.textContent='✓ Забронировать'; card.prepend(hintR); }
+      if(mine){ hintL=document.createElement('div'); hintL.className='swipe-hint left'; hintL.textContent='✕ Снять бронь'; card.prepend(hintL); }
     }
-
-    card.addEventListener('touchstart',e=>{
-      startX=e.touches[0].clientX;
-      startY=e.touches[0].clientY;
-      dx=0; dragging=false; cancelled=false;
-    },{passive:true});
-
+    card.addEventListener('touchstart',e=>{ startX=e.touches[0].clientX; startY=e.touches[0].clientY; dx=0; dragging=false; cancelled=false; },{passive:true});
     card.addEventListener('touchmove',e=>{
-      const cx=e.touches[0].clientX, cy=e.touches[0].clientY;
-      const adx=Math.abs(cx-startX), ady=Math.abs(cy-startY);
-      if(!dragging && ady>adx+2){ cancelled=true; return; }
+      const cx=e.touches[0].clientX,cy=e.touches[0].clientY;
+      const adx=Math.abs(cx-startX),ady=Math.abs(cy-startY);
+      if(!dragging&&ady>adx+2){cancelled=true;return;}
       if(cancelled) return;
-      if(adx>8){ dragging=true; injectHints(); }
+      if(adx>8){dragging=true;injectHints();}
       if(!dragging) return;
       dx=cx-startX;
-      const t=Math.sign(dx)*Math.min(Math.abs(dx)*0.38,58);
-      card.style.transform=`translateX(${t}px)`;
-      card.style.transition='none';
+      const t=Math.sign(dx)*Math.min(Math.abs(dx)*.38,58);
+      card.style.transform=`translateX(${t}px)`; card.style.transition='none';
       const ratio=Math.min(Math.abs(dx)/80,1);
       if(hintR) hintR.style.opacity=dx>0?ratio:0;
       if(hintL) hintL.style.opacity=dx<0?ratio:0;
     },{passive:true});
-
     card.addEventListener('touchend',()=>{
-      card.style.transition='transform .25s cubic-bezier(.25,.46,.45,.94)';
-      card.style.transform='';
-      if(hintR) hintR.style.opacity=0;
-      if(hintL) hintL.style.opacity=0;
+      card.style.transition='transform .25s cubic-bezier(.25,.46,.45,.94)'; card.style.transform='';
+      if(hintR) hintR.style.opacity=0; if(hintL) hintL.style.opacity=0;
       if(!dragging||cancelled) return;
-      if(dx>72&&hintR){ hapticNotif('success'); doBook(id); }
-      else if(dx<-72&&hintL){ hapticNotif('warning'); doUnbook(id); }
-      else if(Math.abs(dx)>40){ haptic('light'); }
+      if(dx>72&&hintR){hapticNotif('success');doBook(id);}
+      else if(dx<-72&&hintL){hapticNotif('warning');doUnbook(id);}
+      else if(Math.abs(dx)>40){haptic('light');}
     });
   });
 }
@@ -662,7 +655,6 @@ function toggleSec(id){
   openSecs.has(id)?openSecs.delete(id):openSecs.add(id);
   document.getElementById('il-'+id)?.classList.toggle('op',openSecs.has(id));
   document.getElementById('arr-'+id)?.classList.toggle('op',openSecs.has(id));
-  renderContent();
   haptic();
 }
 
@@ -672,8 +664,7 @@ function toggleReveal(){
   ['eye-desk','eye-mob'].forEach(id=>document.getElementById(id)?.classList.toggle('on',reveal));
   const lbl=document.getElementById('eye-desk-lbl');
   if(lbl) lbl.textContent=reveal?'Скрыть кто бронирует':'Показать кто бронирует';
-  renderContent();
-  haptic();
+  renderContent(); haptic();
 }
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
@@ -685,23 +676,19 @@ function openModal(itemId){
   const {item,cat}=found;
   const bk=bookings[itemId];
   const mine=bk&&String(bk.id)===String(tgUser.id);
-
   const media=item.media||[];
   const mediaHtml=media.length?`<div class="m-media">${
-    media.map((m,i)=>`<img src="../media/${m}" onclick="lbOpen(${JSON.stringify(media.map(x=>'../media/'+x))},${i})" alt="">`)
+    media.map((m,i)=>`<img src="/media/${m}" onclick="lbOpen(${JSON.stringify(media.map(x=>'/media/'+x))},${i})" alt="">`)
     .join('')}</div>`:'';
-
   const links=item.links||[];
   const linksHtml=links.length?`<div class="m-links">${
     links.map(l=>`<a class="mlink" href="${l.url}" target="_blank">
       <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      ${l.label}</a>`).join('')}</div>`:'' ;
-
+      ${l.label}</a>`).join('')}</div>`:'';
   let html=`<div class="m-emoji">${cat.emoji}</div>
     <div class="m-title">${item.name}</div>
     ${item.sub?`<div class="m-sub">${item.sub}</div>`:'<div style="margin-bottom:14px"></div>'}
     ${mediaHtml}${linksHtml}`;
-
   if(bk&&!mine){
     const who=reveal&&bk.username?`@${bk.username}`:'кто-то из гостей';
     html+=`<div class="m-status s-booked">✓ Забронировано — ${who}</div>
@@ -714,7 +701,6 @@ function openModal(itemId){
     html+=`<button class="mbtn book" onclick="modalBook()">Забронировать подарок</button>
       <button class="mbtn cancel" onclick="closeModal()">Отмена</button>`;
   }
-
   document.getElementById('modal-body').innerHTML=html;
   document.getElementById('ov').classList.add('on');
   document.getElementById('sheet').classList.add('on');
@@ -726,7 +712,6 @@ function closeModal(){
   document.getElementById('sheet').classList.remove('on');
   curItem=null;
 }
-
 function modalBook(){ doBook(curItem); closeModal(); }
 function modalUnbook(){ doUnbook(curItem); closeModal(); }
 
@@ -734,14 +719,13 @@ function modalUnbook(){ doUnbook(curItem); closeModal(); }
 async function doBook(itemId){
   bookings[itemId]={id:tgUser.id,username:tgUser.username,name:tgUser.first_name};
   renderSidebar(); renderStats(); renderContent();
-  // pop animation
   const el=document.getElementById('ic-'+itemId);
   if(el){ el.classList.add('pop'); el.addEventListener('animationend',()=>el.classList.remove('pop'),{once:true}); }
   showToast('✦ Подарок забронирован!');
   try{
     const r=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemId,user:tgUser})});
     if(!r.ok) throw new Error(r.status);
-  } catch{ showToast('Ошибка — синхронизируем…'); await refreshBk(); }
+  } catch { showToast('Ошибка — синхронизируем…'); await refreshBk(); }
 }
 
 async function doUnbook(itemId){
@@ -750,7 +734,7 @@ async function doUnbook(itemId){
   showToast('Бронь снята');
   try{
     await fetch('/api/unbook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemId,user:tgUser})});
-  } catch{ await refreshBk(); }
+  } catch { await refreshBk(); }
 }
 
 async function refreshBk(){
@@ -776,9 +760,7 @@ window.addEventListener('scroll',()=>{
   document.getElementById('scroll-top').classList.toggle('on',window.scrollY>300);
 });
 
-// ── REFRESH ───────────────────────────────────────────────────────────────────
 setInterval(refreshBk, 30_000);
-
 init();
 </script>
 </body>

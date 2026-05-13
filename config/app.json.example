@@ -1,8 +1,21 @@
 {
-  "steam": {
-    "enabled": false,
-    "wishlist_url": "https://store.steampowered.com/wishlist/id/YOUR_STEAM_ID/",
-    "note": "Добавь свою заметку про Steam-вишлист"
+  "pinned_links": [
+    {
+      "id": "steam",
+      "type": "steam",
+      "label": "Вишлист в Steam",
+      "url": "https://store.steampowered.com/wishlist/id/YOUR_STEAM_ID/",
+      "note": "Добавь свою заметку"
+    }
+  ],
+  "parsers": {
+    "steam": {
+      "enabled": true,
+      "profile_url": "https://store.steampowered.com/wishlist/id/YOUR_STEAM_ID/",
+      "category_emoji": "🎮",
+      "category_title": "Steam",
+      "refresh_hours": 6
+    }
   },
   "info_cards": [
     {
@@ -19,8 +32,7 @@
       "text": "Спросите у близких, что подарить",
       "style": "default",
       "contacts": [
-        { "username": "friend1", "label": "@friend1" },
-        { "username": "friend2", "label": "@friend2" }
+        { "username": "friend1", "label": "@friend1" }
       ]
     }
   ]
