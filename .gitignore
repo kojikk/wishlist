@@ -1,0 +1,14 @@
+# Secrets & personal config
+.env
+config/app.json
+config/wishlist.json
+
+# Runtime data
+data/
+
+# Dependencies
+node_modules/
+
+# Editor swap files
+*.swp
+*.swo

@@ -1,0 +1,27 @@
+{
+  "steam": {
+    "enabled": false,
+    "wishlist_url": "https://store.steampowered.com/wishlist/id/YOUR_STEAM_ID/",
+    "note": "Добавь свою заметку про Steam-вишлист"
+  },
+  "info_cards": [
+    {
+      "id": "gift",
+      "icon": "🎁",
+      "title": "Рад любым подаркам!",
+      "text": "Опиши своё отношение к подаркам...",
+      "style": "accent"
+    },
+    {
+      "id": "surprise",
+      "icon": "💬",
+      "title": "Боитесь ошибиться с подарком?",
+      "text": "Спросите у близких, что подарить",
+      "style": "default",
+      "contacts": [
+        { "username": "friend1", "label": "@friend1" },
+        { "username": "friend2", "label": "@friend2" }
+      ]
+    }
+  ]
+}

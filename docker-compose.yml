@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    container_name: tg-wishlist
+    restart: unless-stopped
+    ports:
+      - "3050:3000"
+    volumes:
+      - ./data:/app/data
+      # Конфиг монтируем как volume — можно редактировать без rebuild
+      - ./config:/app/config
+    env_file:
+      - .env

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Вишлист</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Onest:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f0f0f; --sf:#161616; --sf2:#1c1c1c; --sf3:#232323;
+  --br:rgba(255,255,255,0.06); --br2:rgba(255,255,255,0.11);
+  --tx:#f0ede8; --tx2:rgba(240,237,232,0.5); --tx3:rgba(240,237,232,0.2);
+  --ac:#e8c84a; --adim:rgba(232,200,74,0.1); --abr:rgba(232,200,74,0.28);
+  --gn:#4ade80; --gdim:rgba(74,222,128,0.08); --gbr:rgba(74,222,128,0.22);
+  --bl:#63b3ed; --bdim:rgba(99,179,237,0.08); --bbr:rgba(99,179,237,0.2);
+  --red:#f87171;
+  --sw:220px; --r:11px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-size:15px;line-height:1.5;min-height:100dvh;overscroll-behavior:none}
+
+/* ═══ LAYOUT ═══ */
+.app{display:flex;min-height:100dvh}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar{
+  width:var(--sw);flex-shrink:0;
+  position:sticky;top:0;height:100dvh;overflow-y:auto;
+  border-right:1px solid var(--br);
+  display:flex;flex-direction:column;
+  scrollbar-width:none;
+}
+.sidebar::-webkit-scrollbar{display:none}
+
+.sb-top{padding:22px 16px 16px;border-bottom:1px solid var(--br)}
+.sb-logo{font-family:'Unbounded',sans-serif;font-size:17px;font-weight:700;letter-spacing:-.5px;margin-bottom:12px}
+.sb-logo em{color:var(--ac);font-style:normal}
+.sb-counters{display:flex;gap:6px;flex-wrap:wrap}
+.sb-pill{font-size:11px;font-weight:500;padding:3px 9px;border-radius:99px;background:var(--sf2);color:var(--tx2);border:1px solid var(--br);transition:all .25s}
+.sb-pill.gn{background:var(--gdim);color:var(--gn);border-color:var(--gbr)}
+
+.sb-nav{flex:1;padding:8px 8px;overflow-y:auto;scrollbar-width:none}
+.sb-nav::-webkit-scrollbar{display:none}
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 10px;border-radius:8px;cursor:pointer;
+  color:var(--tx2);font-size:13px;text-decoration:none;
+  transition:background .14s,color .14s;
+  user-select:none;
+}
+.nav-item:hover{background:var(--sf2);color:var(--tx)}
+.nav-item.active{background:var(--adim);color:var(--ac)}
+.nav-em{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.nav-lbl{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-cnt{font-size:10px;color:var(--tx3);flex-shrink:0;transition:color .25s}
+.nav-item.active .nav-cnt{color:rgba(232,200,74,.45)}
+.nav-item .nav-cnt.bc{color:var(--gn);opacity:.8}
+
+.sb-foot{padding:12px 16px;border-top:1px solid var(--br)}
+.eye-btn{
+  display:flex;align-items:center;gap:7px;
+  width:100%;padding:8px 10px;border-radius:8px;
+  background:none;border:1px solid var(--br);
+  color:var(--tx2);font-size:12px;cursor:pointer;
+  font-family:'Onest',sans-serif;transition:all .18s;
+}
+.eye-btn:hover{background:var(--sf2);color:var(--tx);border-color:var(--br2)}
+.eye-btn.on{background:var(--adim);border-color:var(--abr);color:var(--ac)}
+
+/* ═══ MAIN ═══ */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+
+/* floating search — desktop */
+.search-float{
+  position:sticky;top:0;z-index:90;
+  padding:14px 28px 10px;
+  background:linear-gradient(to bottom,var(--bg) 70%,transparent);
+  pointer-events:none;
+}
+.search-float-inner{
+  max-width:640px;position:relative;pointer-events:all;
+  filter:drop-shadow(0 2px 12px rgba(0,0,0,.5));
+}
+.search-input{
+  width:100%;background:var(--sf);
+  border:1px solid var(--br2);
+  border-radius:99px;
+  padding:10px 16px 10px 38px;
+  font-family:'Onest',sans-serif;font-size:14px;color:var(--tx);
+  outline:none;transition:border-color .2s,box-shadow .2s;
+  backdrop-filter:blur(10px);
+}
+.search-input::placeholder{color:var(--tx3)}
+.search-input:focus{border-color:rgba(255,255,255,.2);box-shadow:0 0 0 3px rgba(232,200,74,.07)}
+.search-ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:.25;pointer-events:none}
+
+/* ═══ MOBILE HEADER ═══ */
+.mob-hdr{
+  display:none;
+  position:sticky;top:0;z-index:100;
+  background:var(--bg);border-bottom:1px solid var(--br);
+  padding:13px 16px 8px;
+}
+.mob-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mob-logo{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.5px}
+.mob-logo em{color:var(--ac);font-style:normal}
+.mob-eye{background:var(--sf);border:1px solid var(--br);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:.18s}
+.mob-eye.on{background:var(--adim);border-color:var(--abr)}
+.mob-pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.mob-search{position:relative;margin-bottom:2px}
+.mob-search input{width:100%;background:var(--sf);border:1px solid var(--br);border-radius:99px;padding:8px 14px 8px 34px;font-family:'Onest',sans-serif;font-size:14px;color:var(--tx);outline:none;transition:.2s}
+.mob-search input::placeholder{color:var(--tx3)}
+.mob-search input:focus{border-color:var(--br2)}
+.mob-search .search-ic{left:11px}
+
+.mob-cats{display:none;gap:7px;padding:8px 16px 6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--br)}
+.mob-cats::-webkit-scrollbar{display:none}
+.cat-chip{flex-shrink:0;font-size:12px;font-weight:500;padding:5px 12px;border-radius:99px;border:1px solid var(--br);background:var(--sf);color:var(--tx2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.cat-chip.on{background:var(--ac);color:#0f0f0f;border-color:var(--ac);font-weight:600}
+
+/* ═══ CONTENT ═══ */
+.content{padding:8px 28px 80px;max-width:780px}
+
+/* ═══ TOP CARDS ═══ */
+.top-cards{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+.steam-card{
+  display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;
+  background:linear-gradient(135deg,#1b2838,#243447);
+  border:1px solid rgba(102,192,244,.15);
+  border-radius:var(--r);padding:13px 15px;
+  transition:border-color .18s,transform .1s;
+  animation:fadeUp .3s ease both;
+}
+.steam-card:hover{border-color:rgba(102,192,244,.35);transform:translateY(-1px)}
+.steam-card:active{transform:scale(.99)}
+.steam-logo{width:34px;height:34px;flex-shrink:0;background:rgba(102,192,244,.1);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.steam-name{font-size:13px;font-weight:500;color:#c6d4df}
+.steam-sub{font-size:12px;color:rgba(198,212,223,.45);margin-top:1px}
+.steam-arr{margin-left:auto;color:rgba(102,192,244,.4);font-size:14px;transition:transform .18s}
+.steam-card:hover .steam-arr{transform:translateX(3px)}
+
+/* info card styles */
+.info-card{
+  display:flex;gap:12px;align-items:flex-start;
+  border-radius:var(--r);padding:13px 15px;
+  border:1px solid var(--br);
+  animation:fadeUp .35s ease both;
+  transition:transform .15s;
+}
+.info-card:hover{transform:translateY(-1px)}
+.info-card.accent{background:var(--adim);border-color:var(--abr)}
+.info-card.default{background:var(--sf)}
+.info-card.blue{background:var(--bdim);border-color:var(--bbr)}
+.info-card.green{background:var(--gdim);border-color:var(--gbr)}
+.ic-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.ic-title{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:3px}
+.ic-text{font-size:12px;color:var(--tx2);line-height:1.55}
+.ic-contacts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.ic-chip{font-size:12px;font-weight:500;padding:3px 10px;border-radius:99px;background:var(--bdim);color:var(--bl);border:1px solid var(--bbr);text-decoration:none;transition:.15s}
+.ic-chip:hover{background:rgba(99,179,237,.15)}
+
+/* ═══ SECTION ═══ */
+.section{margin-bottom:24px;opacity:0;transform:translateY(10px);animation:fadeUp .35s ease forwards}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+.sec-head{display:flex;align-items:center;gap:9px;margin-bottom:8px;cursor:pointer;user-select:none;padding:4px 2px;border-radius:8px;transition:background .14s}
+.sec-head:hover{background:rgba(255,255,255,.025)}
+.sec-emoji{width:31px;height:31px;border-radius:8px;background:var(--sf);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:transform .2s}
+.sec-head:hover .sec-emoji{transform:scale(1.08)}
+.sec-title{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:600;flex:1;color:var(--tx2);letter-spacing:-.2px;transition:color .15s}
+.sec-head:hover .sec-title{color:var(--tx)}
+.sec-badges{display:flex;gap:4px}
+.badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px}
+.bn{background:var(--sf3);color:var(--tx3);border:1px solid var(--br)}
+.bb{background:var(--gdim);color:var(--gn);border:1px solid var(--gbr)}
+.sec-arr{font-size:9px;color:var(--tx3);transition:transform .22s ease;flex-shrink:0}
+.sec-arr.op{transform:rotate(90deg)}
+
+.cat-media{display:flex;gap:6px;margin-bottom:8px;overflow-x:auto;scrollbar-width:none}
+.cat-media::-webkit-scrollbar{display:none}
+.cat-img{width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--br);flex-shrink:0;cursor:pointer;transition:transform .15s,border-color .15s}
+.cat-img:hover{transform:scale(1.05);border-color:var(--br2)}
+
+.items-list{display:flex;flex-direction:column;gap:5px;overflow:hidden;max-height:0;transition:max-height .38s cubic-bezier(.4,0,.2,1)}
+.items-list.op{max-height:4000px}
+
+/* ═══ ITEM CARD ═══ */
+.item-card{
+  background:var(--sf);border:1px solid var(--br);border-radius:var(--r);
+  padding:11px 14px;cursor:pointer;position:relative;overflow:hidden;
+  transition:background .15s,border-color .15s,transform .12s,box-shadow .15s;
+  animation:cardIn .25s ease both;
+  touch-action:pan-y;
+  user-select:none;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.item-card:hover{background:var(--sf2);border-color:var(--br2)}
+.item-card:active{transform:scale(.99)}
+.item-card.booked{background:var(--gdim);border-color:var(--gbr)}
+.item-card.booked:hover{background:rgba(74,222,128,.12)}
+.item-card.mine{background:var(--adim);border-color:var(--abr)}
+.item-card.mine:hover{background:rgba(232,200,74,.14)}
+
+/* swipe hint layer */
+.swipe-hint{
+  position:absolute;inset:0;border-radius:var(--r);
+  display:flex;align-items:center;padding:0 18px;
+  opacity:0;transition:opacity .1s;pointer-events:none;
+  font-size:13px;font-weight:500;
+  will-change:opacity;
+}
+.swipe-hint.right{background:linear-gradient(90deg,rgba(74,222,128,.2) 0%,transparent 80%);color:var(--gn);justify-content:flex-start}
+.swipe-hint.left{background:linear-gradient(270deg,rgba(248,113,113,.2) 0%,transparent 80%);color:var(--red);justify-content:flex-end}
+
+.item-inner{display:flex;align-items:flex-start;gap:10px;position:relative;z-index:1}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.1);flex-shrink:0;margin-top:5px;border:1px solid rgba(255,255,255,.12);transition:.2s}
+.item-card.booked .dot{background:var(--gn);box-shadow:0 0 6px rgba(74,222,128,.5);border-color:transparent;animation:pg 2.5s infinite}
+.item-card.mine .dot{background:var(--ac);box-shadow:0 0 6px rgba(232,200,74,.45);border-color:transparent;animation:py 2.5s infinite}
+@keyframes pg{0%,100%{box-shadow:0 0 5px rgba(74,222,128,.45)}50%{box-shadow:0 0 10px rgba(74,222,128,.8)}}
+@keyframes py{0%,100%{box-shadow:0 0 5px rgba(232,200,74,.4)}50%{box-shadow:0 0 10px rgba(232,200,74,.7)}}
+
+.item-body{flex:1;min-width:0}
+.item-name{font-size:14px;font-weight:500;line-height:1.3}
+.item-card.booked .item-name{color:var(--tx2)}
+.item-sub{font-size:12px;color:var(--tx3);margin-top:1px}
+.item-meta{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:5px}
+.tag{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500}
+.tg{background:var(--gdim);color:var(--gn);border:1px solid var(--gbr)}
+.ta{background:var(--adim);color:var(--ac);border:1px solid var(--abr)}
+.item-booker{font-size:11px;color:var(--tx3)}
+.item-booker a{color:var(--gn);font-weight:500;text-decoration:none}
+.item-card.mine .item-booker a{color:var(--ac)}
+
+.item-links{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.ilink{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--sf3);color:var(--tx2);border:1px solid var(--br2);text-decoration:none;transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.ilink:hover{background:rgba(255,255,255,.06);color:var(--tx)}
+.item-thumbs{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.thumb{width:60px;height:48px;object-fit:cover;border-radius:7px;border:1px solid var(--br);cursor:pointer;transition:.15s}
+.thumb:hover{transform:scale(1.07);border-color:var(--br2)}
+.thumb-more{width:60px;height:48px;border-radius:7px;border:1px solid var(--br);background:var(--sf3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tx3);cursor:pointer;transition:.15s}
+.thumb-more:hover{background:var(--sf2);color:var(--tx2)}
+
+/* book pop animation */
+@keyframes bookPop{0%{transform:scale(1)}40%{transform:scale(1.03)}70%{transform:scale(.985)}100%{transform:scale(1)}}
+.item-card.pop{animation:bookPop .35s ease}
+
+/* ═══ LIGHTBOX ═══ */
+.lb{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(8px)}
+.lb.on{opacity:1;pointer-events:all}
+.lb-img{max-width:min(88vw,920px);max-height:84dvh;border-radius:10px;object-fit:contain;transition:opacity .18s}
+.lb-x{position:absolute;top:16px;right:18px;font-size:22px;color:rgba(255,255,255,.45);cursor:pointer;transition:.15s;line-height:1}
+.lb-x:hover{color:#fff}
+.lb-p,.lb-n{position:absolute;top:50%;transform:translateY(-50%);font-size:30px;color:rgba(255,255,255,.3);cursor:pointer;padding:12px;transition:.15s;user-select:none}
+.lb-p:hover,.lb-n:hover{color:rgba(255,255,255,.8)}
+.lb-p{left:6px}.lb-n{right:6px}
+.lb-c{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:12px;color:rgba(255,255,255,.35)}
+
+/* ═══ MODAL ═══ */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;opacity:0;pointer-events:none;transition:opacity .22s;backdrop-filter:blur(4px)}
+.ov.on{opacity:1;pointer-events:all}
+.sheet{position:fixed;bottom:0;left:50%;width:100%;max-width:480px;z-index:201;background:#181818;border-top:1px solid var(--br);border-radius:20px 20px 0 0;padding:6px 20px 44px;transform:translate(-50%,100%);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.sheet.on{transform:translate(-50%,0)}
+.handle{width:34px;height:4px;border-radius:2px;background:var(--br2);margin:8px auto 18px}
+.m-emoji{font-size:28px;text-align:center;margin-bottom:7px}
+.m-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;text-align:center;margin-bottom:3px;letter-spacing:-.3px}
+.m-sub{font-size:12px;color:var(--tx2);text-align:center;margin-bottom:16px}
+.mbtn{width:100%;padding:13px;border-radius:11px;border:none;font-family:'Unbounded',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .13s;margin-bottom:7px}
+.mbtn:active{transform:scale(.97)}
+.mbtn.book{background:var(--ac);color:#0f0f0f}
+.mbtn.unbook{background:transparent;color:var(--red);border:1px solid rgba(248,113,113,.22)}
+.mbtn.cancel{background:var(--sf);color:var(--tx2);border:1px solid var(--br)}
+.m-status{text-align:center;padding:11px;border-radius:9px;margin-bottom:13px;font-size:13px}
+.s-booked{background:var(--gdim);color:var(--gn);border:1px solid var(--gbr)}
+.s-mine{background:var(--adim);color:var(--ac);border:1px solid var(--abr)}
+.m-media{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
+.m-media::-webkit-scrollbar{display:none}
+.m-media img{height:88px;width:auto;object-fit:cover;border-radius:8px;border:1px solid var(--br);cursor:pointer;flex-shrink:0;transition:.15s}
+.m-media img:hover{border-color:var(--br2)}
+.m-links{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.mlink{font-size:12px;padding:5px 12px;border-radius:99px;background:var(--sf3);color:var(--tx2);border:1px solid var(--br2);text-decoration:none;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.mlink:hover{background:rgba(255,255,255,.06);color:var(--tx)}
+
+/* ═══ TOAST ═══ */
+.toast{position:fixed;bottom:68px;left:50%;transform:translateX(-50%) translateY(12px);background:#242424;border:1px solid var(--br2);border-radius:99px;padding:8px 18px;font-size:13px;font-weight:500;z-index:300;opacity:0;pointer-events:none;transition:all .22s;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══ SKELETON ═══ */
+.skel{background:var(--sf);border-radius:var(--r);animation:sk 1.4s infinite}
+@keyframes sk{0%,100%{opacity:.35}50%{opacity:.7}}
+.skel-wrap{display:flex;flex-direction:column;gap:10px;padding:20px 28px}
+
+/* ═══ MISC ═══ */
+.empty{text-align:center;padding:60px 20px;color:var(--tx3);font-size:14px;display:none}
+.scroll-top{position:fixed;bottom:24px;right:22px;width:36px;height:36px;border-radius:50%;background:var(--sf2);border:1px solid var(--br);color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transition:all .2s;font-size:16px;z-index:50}
+.scroll-top.on{opacity:1;pointer-events:all}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:720px){
+  .sidebar{display:none}
+  .mob-hdr{display:block}
+  .mob-cats{display:flex}
+  .search-float{display:none}
+  .content{padding:12px 14px 80px}
+  .cat-img{width:66px;height:50px}
+}
+@media(min-width:721px){
+  .mob-hdr{display:none}
+  .mob-cats{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <div class="sb-logo">Вишлист <em>✦</em></div>
+    <div class="sb-counters" id="sb-counters">
+      <span class="sb-pill">…</span>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sb-nav"></nav>
+  <div class="sb-foot">
+    <button class="eye-btn" id="eye-desk" onclick="toggleReveal()">
+      <span>👁</span><span id="eye-desk-lbl">Показать кто бронирует</span>
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- MOBILE HEADER -->
+  <div class="mob-hdr">
+    <div class="mob-top">
+      <div class="mob-logo">Вишлист <em>✦</em></div>
+      <div class="mob-eye" id="eye-mob" onclick="toggleReveal()">👁</div>
+    </div>
+    <div class="mob-pills" id="mob-pills"><span class="sb-pill">…</span></div>
+    <div class="mob-search">
+      <svg class="search-ic" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="white" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Поиск…" id="mob-search-inp" autocomplete="off">
+    </div>
+  </div>
+  <div class="mob-cats" id="mob-cats"></div>
+
+  <!-- FLOATING SEARCH (desktop) -->
+  <div class="search-float">
+    <div class="search-float-inner">
+      <svg class="search-ic" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="white" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input class="search-input" type="text" placeholder="Поиск по вишлисту…" id="desk-search-inp" autocomplete="off">
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="content">
+    <div class="skel-wrap">
+      <div class="skel" style="height:52px"></div>
+      <div class="skel" style="height:52px;opacity:.7"></div>
+      <div class="skel" style="height:44px;opacity:.45"></div>
+      <div class="skel" style="height:44px;opacity:.25"></div>
+    </div>
+  </div>
+  <div class="empty" id="empty">🔍 Ничего не найдено</div>
+
+</main>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="lbOut(event)">
+  <span class="lb-x" onclick="lbClose()">✕</span>
+  <span class="lb-p" onclick="lbNav(-1)">‹</span>
+  <img class="lb-img" id="lb-img" src="" alt="">
+  <span class="lb-n" onclick="lbNav(1)">›</span>
+  <div class="lb-c" id="lb-c"></div>
+</div>
+
+<!-- MODAL -->
+<div class="ov" id="ov" onclick="closeModal()"></div>
+<div class="sheet" id="sheet">
+  <div class="handle"></div>
+  <div id="modal-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+// ── TG ──────────────────────────────────────────────────────────────────────
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.expand(); tg.setHeaderColor('#0f0f0f'); tg.setBackgroundColor('#0f0f0f'); tg.ready(); }
+const tgUser = tg?.initDataUnsafe?.user || { id:'dev', first_name:'Dev', username:'dev' };
+
+function haptic(type='light') {
+  try { tg?.HapticFeedback?.impactOccurred(type); } catch {}
+}
+function hapticNotif(type='success') {
+  try { tg?.HapticFeedback?.notificationOccurred(type); } catch {}
+}
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let WISHLIST=[], CFG={}, bookings={};
+let activeCat='all', query='', openSecs=new Set();
+let curItem=null, reveal=false;
+
+// ── LIGHTBOX ─────────────────────────────────────────────────────────────────
+let lbImgs=[], lbIdx=0;
+function lbOpen(imgs,idx){ lbImgs=imgs; lbIdx=idx; lbSet(); document.getElementById('lb').classList.add('on'); }
+function lbClose(){ document.getElementById('lb').classList.remove('on'); }
+function lbOut(e){ if(e.target===document.getElementById('lb')) lbClose(); }
+function lbSet(){
+  const img=document.getElementById('lb-img');
+  img.style.opacity=0; img.src=lbImgs[lbIdx];
+  img.onload=()=>{ img.style.opacity=1; };
+  document.getElementById('lb-c').textContent = lbImgs.length>1 ? `${lbIdx+1} / ${lbImgs.length}` : '';
+}
+function lbNav(d){ lbIdx=(lbIdx+d+lbImgs.length)%lbImgs.length; lbSet(); }
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('lb').classList.contains('on')) return;
+  if(e.key==='Escape') lbClose();
+  if(e.key==='ArrowLeft') lbNav(-1);
+  if(e.key==='ArrowRight') lbNav(1);
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init(){
+  try {
+    const [cr,br] = await Promise.all([fetch('/api/config'), fetch('/api/bookings')]);
+    if(!cr.ok) throw new Error('/api/config → '+cr.status);
+    const cfg = await cr.json();
+    if(!cfg.wishlist || !Array.isArray(cfg.wishlist)) throw new Error('cfg.wishlist is not array');
+    WISHLIST=cfg.wishlist; CFG=cfg.app||{};
+    bookings=br.ok ? await br.json() : {};
+    openSecs=new Set(WISHLIST.map(c=>c.id));
+    renderSidebar(); renderMobCats(); renderStats(); renderContent();
+  } catch(e) {
+    console.error(e);
+    document.getElementById('content').innerHTML=`<div style="padding:24px;color:var(--tx2);font-size:13px;line-height:1.6">
+      <div style="font-size:26px;margin-bottom:10px">⚠️</div>
+      <b style="color:var(--tx)">Не удалось загрузить</b><br>
+      <code style="font-size:11px;background:var(--sf);padding:6px 10px;border-radius:6px;display:inline-block;margin-top:8px;word-break:break-all">${e.message}</code><br>
+      <span style="margin-top:8px;display:block">docker logs tg-wishlist</span></div>`;
+  }
+}
+
+// ── RENDER SIDEBAR ────────────────────────────────────────────────────────────
+function renderSidebar(){
+  const nav=document.getElementById('sb-nav');
+  const all=[{id:'all',emoji:'✦',title:'Все',items:WISHLIST.flatMap(c=>c.items)},...WISHLIST];
+  nav.innerHTML=all.map(c=>{
+    const bc=c.id==='all' ? Object.keys(bookings).length : c.items.filter(i=>bookings[i.id]).length;
+    return `<a class="nav-item ${activeCat===c.id?'on':''}" onclick="setCat('${c.id}')" href="javascript:void(0)">
+      <span class="nav-em">${c.emoji}</span>
+      <span class="nav-lbl">${c.title}</span>
+      ${bc>0 ? `<span class="nav-cnt bc">✓${bc}</span>` : `<span class="nav-cnt">${c.items.length}</span>`}
+    </a>`;
+  }).join('');
+  renderStats();
+}
+
+function renderStats(){
+  const total=WISHLIST.reduce((s,c)=>s+c.items.length,0);
+  const bc=Object.keys(bookings).length;
+  const html=`<span class="sb-pill">${total} желаний</span>${bc>0?`<span class="sb-pill gn">✓ ${bc}</span>`:''}`;
+  document.getElementById('sb-counters').innerHTML=html;
+  document.getElementById('mob-pills').innerHTML=html;
+}
+
+// ── MOBILE CATS ───────────────────────────────────────────────────────────────
+function renderMobCats(){
+  document.getElementById('mob-cats').innerHTML=
+    [{id:'all',emoji:'✦',title:'Все'},...WISHLIST]
+      .map(c=>`<div class="cat-chip ${activeCat===c.id?'on':''}" onclick="setCat('${c.id}')">${c.emoji} ${c.title}</div>`)
+      .join('');
+}
+
+function setCat(id){ activeCat=id; renderSidebar(); renderMobCats(); renderContent(); haptic(); }
+
+// ── RENDER CONTENT ────────────────────────────────────────────────────────────
+function renderContent(){
+  const el=document.getElementById('content');
+  const emp=document.getElementById('empty');
+  const q=query.toLowerCase().trim();
+
+  const filtered=WISHLIST
+    .filter(c=>activeCat==='all'||c.id===activeCat)
+    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q))}))
+    .filter(c=>c.items.length>0);
+
+  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
+  emp.style.display='none';
+
+  let top='';
+  if(!q && activeCat==='all'){
+    const s=CFG.steam;
+    if(s?.enabled){
+      top+=`<a class="steam-card" href="${s.wishlist_url}" target="_blank">
+        <div class="steam-logo"><img src="media/icons/steam_logo_icon.svg" width="24px" height="24px"></div>
+        <div><div class="steam-name">Вишлист в Steam</div><div class="steam-sub">${s.note||''}</div></div>
+        <div class="steam-arr">→</div>
+      </a>`;
+    }
+    const cards=CFG.info_cards||[];
+    if(cards.length){
+      top+=`<div class="top-cards">`+cards.map((card,ci)=>{
+        const contacts=(card.contacts||[]).map(c=>`<a href="https://t.me/${c.username}" class="ic-chip">${c.label}</a>`).join('');
+        return `<div class="info-card ${card.style||'default'}" style="animation-delay:${(ci+1)*60}ms">
+          <span class="ic-icon">${card.icon||'ℹ️'}</span>
+          <div>
+            <div class="ic-title">${card.title||''}</div>
+            <div class="ic-text">${card.text||''}</div>
+            ${contacts?`<div class="ic-contacts">${contacts}</div>`:''}
+          </div>
+        </div>`;
+      }).join('')+`</div>`;
+    }
+  }
+
+  const secs=filtered.map((cat,ci)=>{
+    const isOpen=openSecs.has(cat.id);
+    const bc=cat.items.filter(i=>bookings[i.id]).length;
+    const catMedia=(cat.media||[]);
+    const catMediaHtml=catMedia.length&&isOpen?`<div class="cat-media">${
+      catMedia.map((m,mi)=>`<img class="cat-img" src="../media/${m}" loading="lazy"
+        onclick="lbOpen(${JSON.stringify(catMedia.map(x=>'../media/'+x))},${mi})" alt="">`)
+      .join('')}</div>`:'' ;
+    return `<div class="section" style="animation-delay:${ci*48}ms" id="sec-${cat.id}">
+      <div class="sec-head" onclick="toggleSec('${cat.id}')">
+        <div class="sec-emoji">${cat.emoji}</div>
+        <div class="sec-title">${cat.title}</div>
+        <div class="sec-badges">
+          ${bc>0?`<span class="badge bb">✓ ${bc}</span>`:''}
+          <span class="badge bn">${cat.items.length}</span>
+        </div>
+        <div class="sec-arr ${isOpen?'op':''}" id="arr-${cat.id}">▶</div>
+      </div>
+      ${catMediaHtml}
+      <div class="items-list ${isOpen?'op':''}" id="il-${cat.id}">
+        ${cat.items.map((item,ii)=>renderItem(item,ii)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=top+secs;
+  attachSwipes();
+}
+
+function renderItem(item,delay){
+  const bk=bookings[item.id];
+  const mine=bk&&String(bk.id)===String(tgUser.id);
+  const cls=bk?(mine?'mine':'booked'):'';
+
+  let bookerHtml='';
+  if(bk&&!mine){
+    bookerHtml=reveal&&bk.username
+      ?`<div class="item-booker">Бронь: <a href="https://t.me/${bk.username}" target="_blank">@${bk.username}</a></div>`
+      :`<div class="item-booker">Уже забронировано ✦</div>`;
+  }
+
+  const links=item.links||[];
+  const linksHtml=links.length?`<div class="item-links">${links.slice(0,3).map(l=>
+    `<a class="ilink" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
+      <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      ${l.label}</a>`).join('')}</div>`:'' ;
+
+  const media=item.media||[];
+  let mediaHtml='';
+  if(media.length){
+    const show=media.slice(0,3), rest=media.length-3;
+    const allU=JSON.stringify(media.map(m=>'../media/'+m));
+    mediaHtml=`<div class="item-thumbs" onclick="event.stopPropagation()">`+
+      show.map((m,i)=>`<img class="thumb" src="../media/${m}" loading="lazy" onclick="lbOpen(${allU},${i})" alt="">`).join('')+
+      (rest>0?`<div class="thumb-more" onclick="lbOpen(${allU},3)">+${rest}</div>`:'')+
+      `</div>`;
+  }
+
+  return `<div class="item-card ${cls}" id="ic-${item.id}" data-id="${item.id}" onclick="openModal('${item.id}')" style="animation-delay:${delay*28}ms">
+    <div class="item-inner">
+      <div class="dot"></div>
+      <div class="item-body">
+        <div class="item-name">${item.name}</div>
+        ${item.sub?`<div class="item-sub">${item.sub}</div>`:''}
+        ${(bk||links.length)?`<div class="item-meta">
+          ${bk&&!mine?'<span class="tag tg">забронировано</span>':''}
+          ${mine?'<span class="tag ta">мой подарок ✦</span>':''}
+          ${bookerHtml}
+        </div>`:''}
+        ${linksHtml}${mediaHtml}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── SWIPE ─────────────────────────────────────────────────────────────────────
+function attachSwipes(){
+  document.querySelectorAll('.item-card').forEach(card=>{
+    let startX=0, startY=0, dx=0;
+    let dragging=false, cancelled=false, hintsInjected=false;
+    const id=card.dataset.id;
+    let hintR=null, hintL=null;
+
+    function injectHints(){
+      if(hintsInjected) return;
+      hintsInjected=true;
+      const bk=bookings[id];
+      const mine=bk&&String(bk.id)===String(tgUser.id);
+      if(!bk){
+        hintR=document.createElement('div');
+        hintR.className='swipe-hint right';
+        hintR.textContent='✓ Забронировать';
+        card.prepend(hintR);
+      }
+      if(mine){
+        hintL=document.createElement('div');
+        hintL.className='swipe-hint left';
+        hintL.textContent='✕ Снять бронь';
+        card.prepend(hintL);
+      }
+    }
+
+    card.addEventListener('touchstart',e=>{
+      startX=e.touches[0].clientX;
+      startY=e.touches[0].clientY;
+      dx=0; dragging=false; cancelled=false;
+    },{passive:true});
+
+    card.addEventListener('touchmove',e=>{
+      const cx=e.touches[0].clientX, cy=e.touches[0].clientY;
+      const adx=Math.abs(cx-startX), ady=Math.abs(cy-startY);
+      if(!dragging && ady>adx+2){ cancelled=true; return; }
+      if(cancelled) return;
+      if(adx>8){ dragging=true; injectHints(); }
+      if(!dragging) return;
+      dx=cx-startX;
+      const t=Math.sign(dx)*Math.min(Math.abs(dx)*0.38,58);
+      card.style.transform=`translateX(${t}px)`;
+      card.style.transition='none';
+      const ratio=Math.min(Math.abs(dx)/80,1);
+      if(hintR) hintR.style.opacity=dx>0?ratio:0;
+      if(hintL) hintL.style.opacity=dx<0?ratio:0;
+    },{passive:true});
+
+    card.addEventListener('touchend',()=>{
+      card.style.transition='transform .25s cubic-bezier(.25,.46,.45,.94)';
+      card.style.transform='';
+      if(hintR) hintR.style.opacity=0;
+      if(hintL) hintL.style.opacity=0;
+      if(!dragging||cancelled) return;
+      if(dx>72&&hintR){ hapticNotif('success'); doBook(id); }
+      else if(dx<-72&&hintL){ hapticNotif('warning'); doUnbook(id); }
+      else if(Math.abs(dx)>40){ haptic('light'); }
+    });
+  });
+}
+
+// ── SECTION TOGGLE ────────────────────────────────────────────────────────────
+function toggleSec(id){
+  openSecs.has(id)?openSecs.delete(id):openSecs.add(id);
+  document.getElementById('il-'+id)?.classList.toggle('op',openSecs.has(id));
+  document.getElementById('arr-'+id)?.classList.toggle('op',openSecs.has(id));
+  renderContent();
+  haptic();
+}
+
+// ── REVEAL ────────────────────────────────────────────────────────────────────
+function toggleReveal(){
+  reveal=!reveal;
+  ['eye-desk','eye-mob'].forEach(id=>document.getElementById(id)?.classList.toggle('on',reveal));
+  const lbl=document.getElementById('eye-desk-lbl');
+  if(lbl) lbl.textContent=reveal?'Скрыть кто бронирует':'Показать кто бронирует';
+  renderContent();
+  haptic();
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function findItem(id){ for(const c of WISHLIST){ const i=c.items.find(x=>x.id===id); if(i) return {item:i,cat:c}; } }
+
+function openModal(itemId){
+  curItem=itemId;
+  const found=findItem(itemId); if(!found) return;
+  const {item,cat}=found;
+  const bk=bookings[itemId];
+  const mine=bk&&String(bk.id)===String(tgUser.id);
+
+  const media=item.media||[];
+  const mediaHtml=media.length?`<div class="m-media">${
+    media.map((m,i)=>`<img src="../media/${m}" onclick="lbOpen(${JSON.stringify(media.map(x=>'../media/'+x))},${i})" alt="">`)
+    .join('')}</div>`:'';
+
+  const links=item.links||[];
+  const linksHtml=links.length?`<div class="m-links">${
+    links.map(l=>`<a class="mlink" href="${l.url}" target="_blank">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      ${l.label}</a>`).join('')}</div>`:'' ;
+
+  let html=`<div class="m-emoji">${cat.emoji}</div>
+    <div class="m-title">${item.name}</div>
+    ${item.sub?`<div class="m-sub">${item.sub}</div>`:'<div style="margin-bottom:14px"></div>'}
+    ${mediaHtml}${linksHtml}`;
+
+  if(bk&&!mine){
+    const who=reveal&&bk.username?`@${bk.username}`:'кто-то из гостей';
+    html+=`<div class="m-status s-booked">✓ Забронировано — ${who}</div>
+      <button class="mbtn cancel" onclick="closeModal()">Понятно</button>`;
+  } else if(mine){
+    html+=`<div class="m-status s-mine">✦ Твой забронированный подарок</div>
+      <button class="mbtn unbook" onclick="modalUnbook()">Снять бронь</button>
+      <button class="mbtn cancel" onclick="closeModal()">Закрыть</button>`;
+  } else {
+    html+=`<button class="mbtn book" onclick="modalBook()">Забронировать подарок</button>
+      <button class="mbtn cancel" onclick="closeModal()">Отмена</button>`;
+  }
+
+  document.getElementById('modal-body').innerHTML=html;
+  document.getElementById('ov').classList.add('on');
+  document.getElementById('sheet').classList.add('on');
+  haptic('light');
+}
+
+function closeModal(){
+  document.getElementById('ov').classList.remove('on');
+  document.getElementById('sheet').classList.remove('on');
+  curItem=null;
+}
+
+function modalBook(){ doBook(curItem); closeModal(); }
+function modalUnbook(){ doUnbook(curItem); closeModal(); }
+
+// ── BOOK / UNBOOK ─────────────────────────────────────────────────────────────
+async function doBook(itemId){
+  bookings[itemId]={id:tgUser.id,username:tgUser.username,name:tgUser.first_name};
+  renderSidebar(); renderStats(); renderContent();
+  // pop animation
+  const el=document.getElementById('ic-'+itemId);
+  if(el){ el.classList.add('pop'); el.addEventListener('animationend',()=>el.classList.remove('pop'),{once:true}); }
+  showToast('✦ Подарок забронирован!');
+  try{
+    const r=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemId,user:tgUser})});
+    if(!r.ok) throw new Error(r.status);
+  } catch{ showToast('Ошибка — синхронизируем…'); await refreshBk(); }
+}
+
+async function doUnbook(itemId){
+  delete bookings[itemId];
+  renderSidebar(); renderStats(); renderContent();
+  showToast('Бронь снята');
+  try{
+    await fetch('/api/unbook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemId,user:tgUser})});
+  } catch{ await refreshBk(); }
+}
+
+async function refreshBk(){
+  try{ const r=await fetch('/api/bookings'); bookings=await r.json(); renderSidebar(); renderContent(); renderStats(); } catch{}
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastT;
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('on');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>el.classList.remove('on'),2400);
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+function onSearch(v){ query=v; renderContent(); }
+document.getElementById('desk-search-inp').addEventListener('input',function(){ onSearch(this.value); });
+document.getElementById('mob-search-inp').addEventListener('input',function(){ onSearch(this.value); });
+
+// ── SCROLL ────────────────────────────────────────────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('scroll-top').classList.toggle('on',window.scrollY>300);
+});
+
+// ── REFRESH ───────────────────────────────────────────────────────────────────
+setInterval(refreshBk, 30_000);
+
+init();
+</script>
+</body>
+</html>
