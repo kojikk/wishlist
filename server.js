@@ -59,7 +59,13 @@ async function runParser(parserId, cfg) {
 
 function scheduleParser(parserId, cfg) {
   clearTimeout(parserTimers[parserId]);
-  if (!cfg?.enabled) return;
+  if (!cfg?.enabled) {
+    if (parserCache.has(parserId)) {
+      parserCache.delete(parserId);
+      broadcastReload();
+    }
+    return;
+  }
   runParser(parserId, cfg).catch(e => console.error(`[parser:${parserId}] error:`, e.message));
   const ms = (cfg.refresh_hours || 6) * 3_600_000;
   parserTimers[parserId] = setTimeout(() => scheduleParser(parserId, cfg), ms);

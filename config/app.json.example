@@ -15,6 +15,13 @@
       "category_emoji": "🎮",
       "category_title": "Steam",
       "refresh_hours": 6
+    },
+    "ohmywishes": {
+      "enabled": false,
+      "profile_url": "https://ohmywishes.com/users/YOUR_USERNAME",
+      "category_emoji": "🎁",
+      "category_title": "OhMyWishes",
+      "refresh_hours": 6
     }
   },
   "info_cards": [

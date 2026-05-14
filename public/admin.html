@@ -593,13 +593,17 @@ function renderPinnedLinkRow(lnk, i, total) {
 }
 
 function renderParserRow(id, cfg) {
-  const labels = { steam: '🎮 Steam' };
+  const labels = { steam: '🎮 Steam', ohmywishes: '🎁 OhMyWishes' };
+  const placeholders = {
+    steam: 'https://store.steampowered.com/wishlist/id/USERNAME/',
+    ohmywishes: 'https://ohmywishes.com/users/USERNAME',
+  };
   return `<div class="parser-row">
     <div>
       <div class="parser-name">${labels[id] || id}</div>
       <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
         <input class="parser-url-inp" value="${esc(cfg.profile_url||cfg.wishlist_url||'')}"
-          placeholder="URL профиля или вишлиста"
+          placeholder="${placeholders[id] || 'URL профиля или вишлиста'}"
           onchange="setParserField('${id}','profile_url',this.value)" style="max-width:360px">
         <button class="tbtn sm" onclick="triggerParserRefresh('${id}')">🔄 Обновить</button>
       </div>
