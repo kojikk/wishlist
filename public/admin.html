@@ -196,6 +196,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
     <span class="save-status" id="save-status"></span>
     <div class="topbar-right">
       <button class="tbtn" onclick="window.open('/', '_blank')">← Открыть сайт</button>
+      <button class="tbtn danger" onclick="doLogout()" title="Выйти и забыть токен">Выйти</button>
       <button class="tbtn primary" id="save-btn" onclick="handleSave()">Сохранить</button>
     </div>
   </div>
@@ -231,16 +232,20 @@ document.getElementById('token-inp').addEventListener('keydown', e => {
   if (e.key === 'Enter') doAuth();
 });
 
-async function doAuth() {
-  const t = document.getElementById('token-inp').value.trim();
+async function doAuth(t, silent = false) {
+  if (!t) t = document.getElementById('token-inp').value.trim();
   if (!t) return;
   const r = await fetch('/api/admin/wishlist', { headers: { 'x-admin-token': t } });
   if (r.status === 401 || r.status === 403) {
-    document.getElementById('auth-err').textContent = 'Неверный токен';
-    document.getElementById('token-inp').classList.add('err');
-    setTimeout(() => document.getElementById('token-inp').classList.remove('err'), 1500);
+    localStorage.removeItem('adminToken');
+    if (!silent) {
+      document.getElementById('auth-err').textContent = 'Неверный токен';
+      document.getElementById('token-inp').classList.add('err');
+      setTimeout(() => document.getElementById('token-inp').classList.remove('err'), 1500);
+    }
     return;
   }
+  localStorage.setItem('adminToken', t);
   TOKEN = t;
   const [wl, ac] = await Promise.all([
     r.json(),
@@ -252,6 +257,15 @@ async function doAuth() {
   document.getElementById('app').classList.add('on');
   renderTab();
 }
+
+function doLogout() {
+  localStorage.removeItem('adminToken');
+  location.reload();
+}
+
+// Авто-вход при наличии сохранённого токена
+const _saved = localStorage.getItem('adminToken');
+if (_saved) doAuth(_saved, true);
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
 function switchTab(tab) {
