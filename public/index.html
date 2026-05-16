@@ -190,6 +190,19 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .cat-img{width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--br);flex-shrink:0;cursor:pointer;transition:transform .15s,border-color .15s}
 .cat-img:hover{transform:scale(1.05);border-color:var(--br2)}
 
+/* ═══ VIEW TABS ═══ */
+.view-tabs{padding:6px 8px;display:flex;flex-direction:column;gap:2px;border-bottom:1px solid var(--br)}
+.vtab{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--tx2);font-family:'Onest',sans-serif;border:none;background:none;width:100%;text-align:left;transition:background .14s,color .14s;user-select:none}
+.vtab:hover{background:var(--sf2);color:var(--tx)}
+.vtab.on{background:var(--adim);color:var(--ac)}
+.vtab-icon{width:20px;flex-shrink:0;text-align:center;font-size:15px;display:flex;align-items:center;justify-content:center}
+.vtab-cnt{font-size:10px;color:var(--tx3);margin-left:auto;flex-shrink:0}
+.vtab.on .vtab-cnt{color:rgba(232,200,74,.45)}
+.mob-view-tabs{flex-direction:row;padding:6px 0 4px;border-bottom:none;gap:5px;overflow-x:auto;scrollbar-width:none}
+.mob-view-tabs::-webkit-scrollbar{display:none}
+.mob-view-tabs .vtab{width:auto;flex-shrink:0;font-size:12px;padding:5px 12px;border-radius:99px;border:1px solid var(--br);background:var(--sf)}
+.mob-view-tabs .vtab.on{background:var(--adim);border-color:var(--abr)}
+
 /* ═══ ITEM CARD ═══ */
 .item-card{
   background:var(--sf);border:1px solid var(--br);border-radius:var(--r);
@@ -241,6 +254,19 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .thumb-more{width:60px;height:48px;border-radius:7px;border:1px solid var(--br);background:var(--sf3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tx3);cursor:pointer;transition:.15s}
 .thumb-more:hover{background:var(--sf2);color:var(--tx2)}
 
+/* ═══ ITEM COVER IMAGE ═══ */
+.item-cover{
+  width:calc(100% + 28px);margin:-11px -14px 10px;
+  height:120px;object-fit:cover;display:block;
+  border-radius:var(--r) var(--r) 0 0;
+}
+/* ═══ ITEM TAGS ═══ */
+.item-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.itag{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500;background:rgba(99,179,237,.08);color:rgba(99,179,237,.7);border:1px solid rgba(99,179,237,.18)}
+/* ═══ STEAM LINK ═══ */
+.ilink.steam{background:rgba(102,192,244,.1);border-color:rgba(102,192,244,.25);color:#c6d4df}
+.ilink.steam:hover{background:rgba(102,192,244,.18);color:#dde9f0}
+
 @keyframes bookPop{0%{transform:scale(1)}40%{transform:scale(1.03)}70%{transform:scale(.985)}100%{transform:scale(1)}}
 .item-card.pop{animation:bookPop .35s ease}
 
@@ -278,6 +304,8 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .m-links{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .mlink{font-size:12px;padding:5px 12px;border-radius:99px;background:var(--sf3);color:var(--tx2);border:1px solid var(--br2);text-decoration:none;transition:.15s;display:inline-flex;align-items:center;gap:5px}
 .mlink:hover{background:rgba(255,255,255,.06);color:var(--tx)}
+.steam-mlink{background:rgba(102,192,244,.1);border-color:rgba(102,192,244,.25);color:#c6d4df}
+.steam-mlink:hover{background:rgba(102,192,244,.18)}
 
 /* ═══ TOAST ═══ */
 .toast{position:fixed;bottom:68px;left:50%;transform:translateX(-50%) translateY(12px);background:#242424;border:1px solid var(--br2);border-radius:99px;padding:8px 18px;font-size:13px;font-weight:500;z-index:300;opacity:0;pointer-events:none;transition:all .22s;white-space:nowrap}
@@ -316,6 +344,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
     <div class="sb-logo">Вишлист <em>✦</em></div>
     <div class="sb-counters" id="sb-counters"><span class="sb-pill">…</span></div>
   </div>
+  <div class="view-tabs" id="view-tabs"></div>
   <nav class="sb-nav" id="sb-nav"></nav>
   <div class="sb-foot">
     <button class="eye-btn" id="eye-desk" onclick="toggleReveal()">
@@ -330,6 +359,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
       <div class="mob-logo">Вишлист <em>✦</em></div>
       <div class="mob-eye" id="eye-mob" onclick="toggleReveal()">👁</div>
     </div>
+    <div class="view-tabs mob-view-tabs" id="mob-view-tabs"></div>
     <div class="mob-pills" id="mob-pills"><span class="sb-pill">…</span></div>
     <div class="mob-search">
       <svg class="search-ic" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="white" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -344,7 +374,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
       <input class="search-input" type="text" placeholder="Поиск по вишлисту…" id="desk-search-inp" autocomplete="off">
     </div>
   </div>
-
   <div class="content" id="content">
     <div class="skel-wrap">
       <div class="skel" style="height:52px"></div>
@@ -387,6 +416,12 @@ function hapticNotif(type='success') { try { tg?.HapticFeedback?.notificationOcc
 let WISHLIST=[], CFG={}, bookings={};
 let activeCat='all', query='', openSecs=new Set();
 let curItem=null, reveal=false;
+let activeView='wishlist'; // 'wishlist' | 'steam' | 'ohmywishes'
+let viewCat={ wishlist:'all', steam:'all', ohmywishes:'all' };
+
+function mainCats()  { return WISHLIST.filter(c=>!c._external); }
+function steamCats() { return WISHLIST.filter(c=>c.source==='steam'); }
+function omwCats()   { return WISHLIST.filter(c=>c.source==='ohmywishes'); }
 
 // ── LIGHTBOX ─────────────────────────────────────────────────────────────────
 let lbImgs=[], lbIdx=0;
@@ -416,8 +451,8 @@ async function init(){
     if(!cfg.wishlist || !Array.isArray(cfg.wishlist)) throw new Error('cfg.wishlist is not array');
     WISHLIST=cfg.wishlist; CFG=cfg.app||{};
     bookings=br.ok ? await br.json() : {};
-    openSecs=new Set(WISHLIST.map(c=>c.id));
-    renderSidebar(); renderMobCats(); renderStats(); renderContent();
+    openSecs=new Set(mainCats().map(c=>c.id));
+    renderViewTabs(); renderSidebar(); renderMobCats(); renderStats(); renderContent();
   } catch(e) {
     console.error(e);
     document.getElementById('content').innerHTML=`<div style="padding:24px;color:var(--tx2);font-size:13px;line-height:1.6">
@@ -435,8 +470,8 @@ async function refreshConfig(){
     WISHLIST=cfg.wishlist||[]; CFG=cfg.app||{};
     bookings=br.ok ? await br.json() : bookings;
     // preserve open sections for new categories
-    WISHLIST.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
-    renderSidebar(); renderMobCats(); renderStats();
+    mainCats().forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
+    renderViewTabs(); renderSidebar(); renderMobCats(); renderStats();
     if(!document.getElementById('ov').classList.contains('on')) renderContent();
   } catch {}
 }
@@ -454,10 +489,13 @@ async function refreshConfig(){
 // ── SIDEBAR ──────────────────────────────────────────────────────────────────
 function renderSidebar(){
   const nav=document.getElementById('sb-nav');
-  const all=[{id:'all',emoji:'✦',title:'Все',items:WISHLIST.flatMap(c=>c.items)},...WISHLIST];
+  if (activeView === 'steam') { nav.innerHTML=''; renderStats(); return; }
+  const cats = activeView === 'ohmywishes' ? omwCats() : mainCats();
+  const all=[{id:'all',emoji:'✦',title:'Все',items:cats.flatMap(c=>c.items)},...cats];
   nav.innerHTML=all.map(c=>{
-    const bc=c.id==='all' ? Object.keys(bookings).length : c.items.filter(i=>bookings[i.id]).length;
-    return `<a class="nav-item ${activeCat===c.id?'on':''}" onclick="setCat('${c.id}')" href="javascript:void(0)">
+    const bc=c.id==='all' ? cats.flatMap(x=>x.items).filter(i=>bookings[i.id]).length : c.items.filter(i=>bookings[i.id]).length;
+    const isOn = activeCat===c.id;
+    return `<a class="nav-item ${isOn?'on':''}" onclick="setCat('${c.id}')" href="javascript:void(0)">
       <span class="nav-em">${c.emoji}</span>
       <span class="nav-lbl">${c.title}</span>
       ${bc>0 ? `<span class="nav-cnt bc">✓${bc}</span>` : `<span class="nav-cnt">${c.items.length}</span>`}
@@ -467,21 +505,55 @@ function renderSidebar(){
 }
 
 function renderStats(){
-  const total=WISHLIST.reduce((s,c)=>s+c.items.length,0);
-  const bc=Object.keys(bookings).length;
+  const cats = activeView==='steam' ? steamCats() : activeView==='ohmywishes' ? omwCats() : mainCats();
+  const total=cats.reduce((s,c)=>s+c.items.length,0);
+  const bc=cats.flatMap(c=>c.items).filter(i=>bookings[i.id]).length;
   const html=`<span class="sb-pill">${total} желаний</span>${bc>0?`<span class="sb-pill gn">✓ ${bc}</span>`:''}`;
   document.getElementById('sb-counters').innerHTML=html;
   document.getElementById('mob-pills').innerHTML=html;
 }
 
 function renderMobCats(){
-  document.getElementById('mob-cats').innerHTML=
-    [{id:'all',emoji:'✦',title:'Все'},...WISHLIST]
-      .map(c=>`<div class="cat-chip ${activeCat===c.id?'on':''}" onclick="setCat('${c.id}')">${c.emoji} ${c.title}</div>`)
-      .join('');
+  const el=document.getElementById('mob-cats');
+  if (activeView === 'steam') { el.style.display='none'; return; }
+  el.style.display='';
+  const cats = activeView === 'ohmywishes' ? omwCats() : mainCats();
+  el.innerHTML=[{id:'all',emoji:'✦',title:'Все'},...cats]
+    .map(c=>`<div class="cat-chip ${activeCat===c.id?'on':''}" onclick="setCat('${c.id}')">${c.emoji} ${c.title}</div>`)
+    .join('');
 }
 
-function setCat(id){ activeCat=id; renderSidebar(); renderMobCats(); renderContent(); haptic(); }
+function setCat(id){ activeCat=(activeCat===id?'all':id); viewCat[activeView]=activeCat; renderSidebar(); renderMobCats(); renderContent(); haptic(); }
+
+// ── VIEW TABS ────────────────────────────────────────────────────────────────
+function renderViewTabs() {
+  const steamIcon = `<img style="width:15px;height:15px;opacity:.8" src="/media/icons/steam_logo_icon.svg">`;
+  const views = [{ id:'wishlist', label:'Вишлист', icon:'✦' }];
+  const sc = steamCats(), oc = omwCats();
+  if (sc.length) views.push({ id:'steam', label:'Steam', icon:steamIcon, count: sc.reduce((s,c)=>s+c.items.length,0) });
+  if (oc.length) views.push({ id:'ohmywishes', label:'OhMyWishes', icon:'🎁', count: oc.reduce((s,c)=>s+c.items.length,0) });
+
+  if (activeView !== 'wishlist' && !views.find(v => v.id === activeView)) setView('wishlist');
+
+  const html = views.map(v => `
+    <button class="vtab ${activeView===v.id?'on':''}" onclick="setView('${v.id}')">
+      <span class="vtab-icon">${v.icon}</span>
+      <span>${v.label}</span>
+      ${v.count!=null?`<span class="vtab-cnt">${v.count}</span>`:''}
+    </button>`).join('');
+  ['view-tabs','mob-view-tabs'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=html; });
+}
+
+function setView(id) {
+  if (activeView === id) return;
+  activeView = id;
+  activeCat = viewCat[id] || 'all';
+  query = '';
+  document.getElementById('desk-search-inp').value = '';
+  document.getElementById('mob-search-inp').value = '';
+  renderViewTabs(); renderSidebar(); renderMobCats(); renderStats(); renderContent();
+  haptic();
+}
 
 // ── PINNED LINKS ──────────────────────────────────────────────────────────────
 function renderPinnedLink(link, delay){
@@ -507,13 +579,40 @@ function renderPinnedLink(link, delay){
 }
 
 // ── CONTENT ───────────────────────────────────────────────────────────────────
-function renderContent(){
+function renderSection(cat, ci) {
+  const isOpen=openSecs.has(cat.id);
+  const bc=cat.items.filter(i=>bookings[i.id]).length;
+  const catMedia=cat.media||[];
+  const catMediaHtml=catMedia.length
+    ?`<div class="cat-media">${catMedia.map((m,mi)=>
+        `<img class="cat-img" src="/media/${m}" loading="lazy"
+          onclick="lbOpen(${JSON.stringify(catMedia.map(x=>'/media/'+x))},${mi})" alt="">`
+      ).join('')}</div>`
+    :'';
+  return `<div class="section" style="animation-delay:${ci*48}ms" id="sec-${cat.id}">
+    <div class="sec-head" onclick="toggleSec('${cat.id}')">
+      <div class="sec-emoji">${cat.emoji}</div>
+      <div class="sec-title">${cat.title}</div>
+      <div class="sec-badges">
+        ${bc>0?`<span class="badge bb">✓ ${bc}</span>`:''}
+        <span class="badge bn">${cat.items.length}</span>
+      </div>
+      <div class="sec-arr ${isOpen?'op':''}" id="arr-${cat.id}">▶</div>
+    </div>
+    <div class="items-list ${isOpen?'op':''}" id="il-${cat.id}">
+      ${catMediaHtml}
+      ${cat.items.map((item,ii)=>renderItem(item,ii)).join('')}
+    </div>
+  </div>`;
+}
+
+function renderContentWishlist() {
   const el=document.getElementById('content');
   const emp=document.getElementById('empty');
   const q=query.toLowerCase().trim();
 
-  const filtered=WISHLIST
-    .filter(c=>activeCat==='all'||c.id===activeCat)
+  const filtered=mainCats()
+    .filter(c=> activeCat==='all' || c.id===activeCat)
     .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q))}))
     .filter(c=>c.items.length>0);
 
@@ -539,35 +638,55 @@ function renderContent(){
     if(parts.length) topHtml=`<div class="top-cards">${parts.join('')}</div>`;
   }
 
-  const secsHtml=filtered.map((cat,ci)=>{
-    const isOpen=openSecs.has(cat.id);
-    const bc=cat.items.filter(i=>bookings[i.id]).length;
-    const catMedia=cat.media||[];
-    const catMediaHtml=catMedia.length
-      ?`<div class="cat-media">${catMedia.map((m,mi)=>
-          `<img class="cat-img" src="/media/${m}" loading="lazy"
-            onclick="lbOpen(${JSON.stringify(catMedia.map(x=>'/media/'+x))},${mi})" alt="">`
-        ).join('')}</div>`
-      :'';
-    return `<div class="section" style="animation-delay:${ci*48}ms" id="sec-${cat.id}">
-      <div class="sec-head" onclick="toggleSec('${cat.id}')">
-        <div class="sec-emoji">${cat.emoji}</div>
-        <div class="sec-title">${cat.title}</div>
-        <div class="sec-badges">
-          ${bc>0?`<span class="badge bb">✓ ${bc}</span>`:''}
-          <span class="badge bn">${cat.items.length}</span>
-        </div>
-        <div class="sec-arr ${isOpen?'op':''}" id="arr-${cat.id}">▶</div>
-      </div>
-      <div class="items-list ${isOpen?'op':''}" id="il-${cat.id}">
-        ${catMediaHtml}
-        ${cat.items.map((item,ii)=>renderItem(item,ii)).join('')}
-      </div>
-    </div>`;
-  }).join('');
-
-  el.innerHTML=topHtml+secsHtml;
+  el.innerHTML=topHtml+filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
   attachSwipes();
+}
+
+function renderContentSteam() {
+  const el=document.getElementById('content');
+  const emp=document.getElementById('empty');
+  const q=query.toLowerCase().trim();
+  const cats=steamCats();
+
+  if(!cats.length){ el.innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--tx3);font-size:14px">🎮 Steam не подключён</div>'; emp.style.display='none'; return; }
+
+  const filtered=cats
+    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.tags||[]).some(t=>t.toLowerCase().includes(q)))}))
+    .filter(c=>c.items.length>0);
+
+  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
+  emp.style.display='none';
+
+  filtered.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
+  el.innerHTML=filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
+  attachSwipes();
+}
+
+function renderContentOMW() {
+  const el=document.getElementById('content');
+  const emp=document.getElementById('empty');
+  const q=query.toLowerCase().trim();
+  const cats=omwCats();
+
+  if(!cats.length){ el.innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--tx3);font-size:14px">🎁 OhMyWishes не подключён</div>'; emp.style.display='none'; return; }
+
+  const filtered=cats
+    .filter(c=> activeCat==='all' || c.id===activeCat)
+    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q))}))
+    .filter(c=>c.items.length>0);
+
+  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
+  emp.style.display='none';
+
+  filtered.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
+  el.innerHTML=filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
+  attachSwipes();
+}
+
+function renderContent() {
+  if (activeView === 'steam')      return renderContentSteam();
+  if (activeView === 'ohmywishes') return renderContentOMW();
+  renderContentWishlist();
 }
 
 function renderItem(item,delay){
@@ -580,27 +699,47 @@ function renderItem(item,delay){
       ?`<div class="item-booker">Бронь: <a href="https://t.me/${bk.username}" target="_blank">@${bk.username}</a></div>`
       :`<div class="item-booker">Уже забронировано ✦</div>`;
   }
+  // Cover image (external URL or local /media/ path)
+  const coverUrl = item.imageUrl || (item.media?.length ? (item.media[0].startsWith('http')?item.media[0]:'/media/'+item.media[0]) : null);
+  const coverHtml = coverUrl
+    ? `<img class="item-cover" src="${coverUrl}" loading="lazy" alt="" onclick="lbOpen([${JSON.stringify(coverUrl)}],0);event.stopPropagation()">`
+    : '';
+
+  // Tags (genres for Steam etc.)
+  const tags=item.tags||[];
+  const tagsHtml=tags.length?`<div class="item-tags">${tags.map(t=>`<span class="itag">${t}</span>`).join('')}</div>`:'';
+
+  // Links
   const links=item.links||[];
-  const linksHtml=links.length?`<div class="item-links">${links.slice(0,3).map(l=>
-    `<a class="ilink" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
-      <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      ${l.label}</a>`).join('')}</div>`:'';
-  const media=item.media||[];
+  const linksHtml=links.length?`<div class="item-links">${links.slice(0,3).map(l=>{
+    const isSteam=l.style==='steam';
+    return `<a class="ilink${isSteam?' steam':''}" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
+      ${isSteam
+        ? `<img src="/media/icons/steam_logo_icon.svg" width="10" height="10" style="opacity:.7">`
+        : `<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`}
+      ${l.label}</a>`;
+  }).join('')}</div>`:'';
+
+  // Local media thumbnails (skip if imageUrl already used as cover)
+  const media=(item.media||[]).filter(m=>!item.imageUrl);
   let mediaHtml='';
   if(media.length){
     const show=media.slice(0,3), rest=media.length-3;
-    const allU=JSON.stringify(media.map(m=>'/media/'+m));
+    const allU=JSON.stringify(media.map(m=>m.startsWith('http')?m:'/media/'+m));
     mediaHtml=`<div class="item-thumbs" onclick="event.stopPropagation()">`+
-      show.map((m,i)=>`<img class="thumb" src="/media/${m}" loading="lazy" onclick="lbOpen(${allU},${i})" alt="">`).join('')+
+      show.map((m,i)=>{ const src=m.startsWith('http')?m:'/media/'+m; return `<img class="thumb" src="${src}" loading="lazy" onclick="lbOpen(${allU},${i})" alt="">`;}).join('')+
       (rest>0?`<div class="thumb-more" onclick="lbOpen(${allU},3)">+${rest}</div>`:'')+
       `</div>`;
   }
+
   return `<div class="item-card ${cls}" id="ic-${item.id}" data-id="${item.id}" onclick="openModal('${item.id}')" style="animation-delay:${delay*28}ms">
+    ${coverHtml}
     <div class="item-inner">
       <div class="dot"></div>
       <div class="item-body">
         <div class="item-name">${item.name}</div>
         ${item.sub?`<div class="item-sub">${item.sub}</div>`:''}
+        ${tagsHtml}
         ${(bk||links.length)?`<div class="item-meta">
           ${bk&&!mine?'<span class="tag tg">забронировано</span>':''}
           ${mine?'<span class="tag ta">мой подарок ✦</span>':''}
@@ -677,18 +816,27 @@ function openModal(itemId){
   const bk=bookings[itemId];
   const mine=bk&&String(bk.id)===String(tgUser.id);
   const media=item.media||[];
-  const mediaHtml=media.length?`<div class="m-media">${
-    media.map((m,i)=>`<img src="/media/${m}" onclick="lbOpen(${JSON.stringify(media.map(x=>'/media/'+x))},${i})" alt="">`)
+  const allImgs=[
+    ...(item.imageUrl?[item.imageUrl]:[]),
+    ...media.map(m=>m.startsWith('http')?m:'/media/'+m),
+  ];
+  const mediaHtml=allImgs.length?`<div class="m-media">${
+    allImgs.map((src,i)=>`<img src="${src}" onclick="lbOpen(${JSON.stringify(allImgs)},${i})" alt="">`)
     .join('')}</div>`:'';
   const links=item.links||[];
+  const tags=item.tags||[];
+  const tagsHtml=tags.length?`<div class="item-tags" style="justify-content:center;margin-bottom:10px">${tags.map(t=>`<span class="itag">${t}</span>`).join('')}</div>`:'';
   const linksHtml=links.length?`<div class="m-links">${
-    links.map(l=>`<a class="mlink" href="${l.url}" target="_blank">
-      <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      ${l.label}</a>`).join('')}</div>`:'';
+    links.map(l=>{
+      const isSteam=l.style==='steam';
+      return `<a class="mlink${isSteam?' steam-mlink':''}" href="${l.url}" target="_blank">
+        ${isSteam?`<img src="/media/icons/steam_logo_icon.svg" width="12" height="12" style="opacity:.7">`:`<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`}
+        ${l.label}</a>`;
+    }).join('')}</div>`:'';
   let html=`<div class="m-emoji">${cat.emoji}</div>
     <div class="m-title">${item.name}</div>
     ${item.sub?`<div class="m-sub">${item.sub}</div>`:'<div style="margin-bottom:14px"></div>'}
-    ${mediaHtml}${linksHtml}`;
+    ${tagsHtml}${mediaHtml}${linksHtml}`;
   if(bk&&!mine){
     const who=reveal&&bk.username?`@${bk.username}`:'кто-то из гостей';
     html+=`<div class="m-status s-booked">✓ Забронировано — ${who}</div>

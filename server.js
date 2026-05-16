@@ -42,18 +42,27 @@ const parserTimers = {};
 async function runParser(parserId, cfg) {
   const parser = PARSERS[parserId];
   if (!parser) throw new Error(`Unknown parser: ${parserId}`);
-  const items = await parser.fetch(cfg);
-  parserCache.set(parserId, {
-    cat: {
+  const result = await parser.fetch(cfg);
+
+  let cats;
+  // Multi-category: parser returns array of {id, title, emoji, items}
+  if (Array.isArray(result) && result.length > 0 && Array.isArray(result[0]?.items)) {
+    cats = result.map(cat => ({ ...cat, source: parserId, _external: true }));
+  } else {
+    // Single-category: parser returns flat items array
+    cats = [{
       id: `__${parserId}__`,
       emoji: cfg.category_emoji || parser.defaultEmoji || '📋',
       title: cfg.category_title || parser.defaultTitle || parserId,
-      items,
+      source: parserId,
       _external: true,
-    },
-    fetchedAt: Date.now(),
-  });
-  console.log(`[parser:${parserId}] fetched ${items.length} items`);
+      items: Array.isArray(result) ? result : [],
+    }];
+  }
+
+  parserCache.set(parserId, { cats, fetchedAt: Date.now() });
+  const total = cats.reduce((s, c) => s + c.items.length, 0);
+  console.log(`[parser:${parserId}] fetched ${total} items in ${cats.length} category(-ies)`);
   broadcastReload();
 }
 
@@ -134,7 +143,13 @@ const dbRun = (sql, p=[]) => new Promise((res,rej) => db.run(sql, p, function(e)
 
 const app = express();
 app.use(express.json({ limit: '4mb' }));
-app.use(express.static(PUBLIC_DIR));
+app.use(express.static(PUBLIC_DIR, {
+  setHeaders(res, filePath) {
+    if (filePath.endsWith('.html')) {
+      res.set('Cache-Control', 'no-store');
+    }
+  }
+}));
 
 function adminAuth(req, res, next) {
   if (!ADMIN_TOKEN) return res.status(403).json({ error: 'ADMIN_TOKEN not configured' });
@@ -164,7 +179,7 @@ app.get('/api/reload-stream', (req, res) => {
 app.get('/api/config', (req, res) => {
   try {
     const cfg = loadConfig();
-    const externalCats = [...parserCache.values()].map(c => c.cat);
+    const externalCats = [...parserCache.values()].flatMap(p => p.cats);
     res.json({ wishlist: [...cfg.wishlist, ...externalCats], app: cfg.app });
   } catch (e) {
     console.error('Config read error:', e);
@@ -240,6 +255,7 @@ app.get('/api/admin/app-config', adminAuth, (req, res) => {
 
 app.put('/api/admin/app-config', adminAuth, (req, res) => {
   try {
+    console.log('[PUT app-config] ohmywishes.profile_url =', req.body?.parsers?.ohmywishes?.profile_url);
     fs.writeFileSync(path.join(CONFIG_DIR, 'app.json'), JSON.stringify(req.body, null, 2), 'utf8');
     scheduleParsers();
     res.json({ success: true });
@@ -255,7 +271,7 @@ app.get('/api/admin/parsers', adminAuth, (req, res) => {
     const cached = parserCache.get(id);
     result[id] = {
       enabled: cfg.enabled,
-      itemCount: cached?.cat?.items?.length ?? null,
+      itemCount: cached?.cats?.reduce((s, c) => s + c.items.length, 0) ?? null,
       fetchedAt: cached?.fetchedAt ?? null,
     };
   }

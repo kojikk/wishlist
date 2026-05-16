@@ -604,7 +604,8 @@ function renderParserRow(id, cfg) {
       <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
         <input class="parser-url-inp" value="${esc(cfg.profile_url||cfg.wishlist_url||'')}"
           placeholder="${placeholders[id] || 'URL профиля или вишлиста'}"
-          onchange="setParserField('${id}','profile_url',this.value)" style="max-width:360px">
+          oninput="setParserField('${id}','profile_url',this.value)"
+          onblur="setParserField('${id}','profile_url',this.value);saveAppConfig()" style="max-width:360px">
         <button class="tbtn sm" onclick="triggerParserRefresh('${id}')">🔄 Обновить</button>
       </div>
     </div>
@@ -648,6 +649,7 @@ function toggleParser(id) {
   if (!appConfig.parsers?.[id]) return;
   appConfig.parsers[id].enabled = !appConfig.parsers[id].enabled;
   document.getElementById('toggle-'+id)?.classList.toggle('on', appConfig.parsers[id].enabled);
+  saveAppConfig();
 }
 
 async function triggerParserRefresh(id) {
