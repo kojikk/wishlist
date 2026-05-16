@@ -210,6 +210,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
   transition:background .15s,border-color .15s,transform .12s;
   animation:cardIn .25s ease both;touch-action:pan-y;user-select:none;
 }
+.item-name,.item-sub,.item-tags,.item-links{user-select:text}
 @keyframes cardIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .item-card:hover{background:var(--sf2);border-color:var(--br2)}
 .item-card:active{transform:scale(.99)}
@@ -248,24 +249,49 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .item-links{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
 .ilink{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--sf3);color:var(--tx2);border:1px solid var(--br2);text-decoration:none;transition:.15s;display:inline-flex;align-items:center;gap:4px}
 .ilink:hover{background:rgba(255,255,255,.06);color:var(--tx)}
-.item-thumbs{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
-.thumb{width:60px;height:48px;object-fit:cover;border-radius:7px;border:1px solid var(--br);cursor:pointer;transition:.15s}
-.thumb:hover{transform:scale(1.07);border-color:var(--br2)}
-.thumb-more{width:60px;height:48px;border-radius:7px;border:1px solid var(--br);background:var(--sf3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tx3);cursor:pointer;transition:.15s}
-.thumb-more:hover{background:var(--sf2);color:var(--tx2)}
 
-/* ═══ ITEM COVER IMAGE ═══ */
-.item-cover{
-  width:calc(100% + 28px);margin:-11px -14px 10px;
-  height:120px;object-fit:cover;display:block;
-  border-radius:var(--r) var(--r) 0 0;
-}
 /* ═══ ITEM TAGS ═══ */
 .item-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
 .itag{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500;background:rgba(99,179,237,.08);color:rgba(99,179,237,.7);border:1px solid rgba(99,179,237,.18)}
-/* ═══ STEAM LINK ═══ */
-.ilink.steam{background:rgba(102,192,244,.1);border-color:rgba(102,192,244,.25);color:#c6d4df}
-.ilink.steam:hover{background:rgba(102,192,244,.18);color:#dde9f0}
+/* ═══ STEAM OPEN BUTTON ═══ */
+.steam-open-btn{
+  display:flex;align-items:center;gap:6px;
+  margin:8px -14px -11px;padding:7px 14px;
+  background:rgba(102,192,244,.06);border-top:1px solid rgba(102,192,244,.1);
+  color:rgba(198,212,223,.6);font-size:11px;font-weight:500;text-decoration:none;
+  transition:background .15s,color .15s;
+  border-radius:0 0 var(--r) var(--r);
+}
+.steam-open-btn:hover{background:rgba(102,192,244,.12);color:#c6d4df}
+.steam-open-arr{margin-left:auto;font-size:12px;opacity:.5;transition:transform .15s}
+.steam-open-btn:hover .steam-open-arr{transform:translateX(3px)}
+
+/* ═══ ITEM SIDE THUMBNAIL ═══ */
+.item-thumb-box{
+  position:relative;width:80px;height:80px;flex-shrink:0;
+  border-radius:8px;overflow:hidden;border:1px solid var(--br);
+  align-self:center;cursor:pointer;
+}
+.item-thumb-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .22s}
+.item-thumb-box:hover .item-thumb-img{transform:scale(1.05)}
+.item-thumb-nav{
+  position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:space-between;pointer-events:none;
+  opacity:0;transition:opacity .15s;
+}
+.item-thumb-box:hover .item-thumb-nav{opacity:1;pointer-events:all}
+@media(max-width:720px){.item-thumb-nav{opacity:.55;pointer-events:all}}
+.thnav-btn{
+  background:rgba(0,0,0,.55);color:rgba(255,255,255,.9);border:none;cursor:pointer;
+  padding:0;width:22px;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;transition:background .1s;
+}
+.thnav-btn:hover{background:rgba(0,0,0,.72)}
+.item-thumb-cnt{
+  position:absolute;bottom:3px;right:4px;font-size:9px;font-weight:600;
+  background:rgba(0,0,0,.55);color:rgba(255,255,255,.85);
+  border-radius:99px;padding:1px 5px;pointer-events:none;
+}
 
 @keyframes bookPop{0%{transform:scale(1)}40%{transform:scale(1.03)}70%{transform:scale(.985)}100%{transform:scale(1)}}
 .item-card.pop{animation:bookPop .35s ease}
@@ -422,6 +448,7 @@ let viewCat={ wishlist:'all', steam:'all', ohmywishes:'all' };
 function mainCats()  { return WISHLIST.filter(c=>!c._external); }
 function steamCats() { return WISHLIST.filter(c=>c.source==='steam'); }
 function omwCats()   { return WISHLIST.filter(c=>c.source==='ohmywishes'); }
+function uniqueItems(cats){ const seen=new Set(); return cats.flatMap(c=>c.items).filter(i=>{ if(seen.has(i.id))return false; seen.add(i.id); return true; }); }
 
 // ── LIGHTBOX ─────────────────────────────────────────────────────────────────
 let lbImgs=[], lbIdx=0;
@@ -435,6 +462,42 @@ function lbSet(){
   document.getElementById('lb-c').textContent = lbImgs.length>1 ? `${lbIdx+1} / ${lbImgs.length}` : '';
 }
 function lbNav(d){ lbIdx=(lbIdx+d+lbImgs.length)%lbImgs.length; lbSet(); }
+
+function lbOpenThumb(box){
+  const imgs=JSON.parse(box.dataset.imgs||'[]');
+  const idx=parseInt(box.dataset.idx||0);
+  lbOpen(imgs,idx);
+}
+
+function fitThumb(img){
+  const r=img.naturalWidth/img.naturalHeight;
+  const mob=window.innerWidth<=720;
+  // [w, h] presets based on aspect ratio
+  let w,h;
+  if      (r<0.6)   {w=58; h=100;}
+  else if (r<0.85)  {w=66; h=88;}
+  else if (r<=1.2)  {w=80; h=80;}
+  else if (r<=1.8)  {w=102;h=72;}
+  else              {w=122;h=66;}
+  if(mob){w=Math.round(w*.82);h=Math.round(h*.82);}
+  const box=img.closest('.item-thumb-box');
+  if(box){box.style.width=w+'px';box.style.height=h+'px';}
+}
+
+function thumbNav(itemId,dir,e){
+  if(e){e.stopPropagation();}
+  const box=document.getElementById('tb-'+itemId);
+  if(!box) return;
+  const imgs=JSON.parse(box.dataset.imgs||'[]');
+  if(imgs.length<2) return;
+  const idx=(parseInt(box.dataset.idx||0)+dir+imgs.length)%imgs.length;
+  box.dataset.idx=idx;
+  const img=box.querySelector('.item-thumb-img');
+  if(img) img.src=imgs[idx];
+  const cnt=box.querySelector('.item-thumb-cnt');
+  if(cnt) cnt.textContent=`${idx+1}/${imgs.length}`;
+}
+
 document.addEventListener('keydown',e=>{
   if(!document.getElementById('lb').classList.contains('on')) return;
   if(e.key==='Escape') lbClose();
@@ -491,7 +554,7 @@ function renderSidebar(){
   const nav=document.getElementById('sb-nav');
   if (activeView === 'steam') { nav.innerHTML=''; renderStats(); return; }
   const cats = activeView === 'ohmywishes' ? omwCats() : mainCats();
-  const all=[{id:'all',emoji:'✦',title:'Все',items:cats.flatMap(c=>c.items)},...cats];
+  const all=[{id:'all',emoji:'✦',title:'Все',items:uniqueItems(cats)},...cats];
   nav.innerHTML=all.map(c=>{
     const bc=c.id==='all' ? cats.flatMap(x=>x.items).filter(i=>bookings[i.id]).length : c.items.filter(i=>bookings[i.id]).length;
     const isOn = activeCat===c.id;
@@ -506,8 +569,9 @@ function renderSidebar(){
 
 function renderStats(){
   const cats = activeView==='steam' ? steamCats() : activeView==='ohmywishes' ? omwCats() : mainCats();
-  const total=cats.reduce((s,c)=>s+c.items.length,0);
-  const bc=cats.flatMap(c=>c.items).filter(i=>bookings[i.id]).length;
+  const uniq=uniqueItems(cats);
+  const total=uniq.length;
+  const bc=uniq.filter(i=>bookings[i.id]).length;
   const html=`<span class="sb-pill">${total} желаний</span>${bc>0?`<span class="sb-pill gn">✓ ${bc}</span>`:''}`;
   document.getElementById('sb-counters').innerHTML=html;
   document.getElementById('mob-pills').innerHTML=html;
@@ -528,10 +592,10 @@ function setCat(id){ activeCat=(activeCat===id?'all':id); viewCat[activeView]=ac
 // ── VIEW TABS ────────────────────────────────────────────────────────────────
 function renderViewTabs() {
   const steamIcon = `<img style="width:15px;height:15px;opacity:.8" src="/media/icons/steam_logo_icon.svg">`;
-  const views = [{ id:'wishlist', label:'Вишлист', icon:'✦' }];
+  const views = [{ id:'wishlist', label:'Вишлист', icon:'✦', count: uniqueItems(mainCats()).length }];
   const sc = steamCats(), oc = omwCats();
   if (sc.length) views.push({ id:'steam', label:'Steam', icon:steamIcon, count: sc.reduce((s,c)=>s+c.items.length,0) });
-  if (oc.length) views.push({ id:'ohmywishes', label:'OhMyWishes', icon:'🎁', count: oc.reduce((s,c)=>s+c.items.length,0) });
+  if (oc.length) views.push({ id:'ohmywishes', label:'OhMyWishes', icon:'🎁', count: uniqueItems(oc).length });
 
   if (activeView !== 'wishlist' && !views.find(v => v.id === activeView)) setView('wishlist');
 
@@ -699,41 +763,42 @@ function renderItem(item,delay){
       ?`<div class="item-booker">Бронь: <a href="https://t.me/${bk.username}" target="_blank">@${bk.username}</a></div>`
       :`<div class="item-booker">Уже забронировано ✦</div>`;
   }
-  // Cover image (external URL or local /media/ path)
-  const coverUrl = item.imageUrl || (item.media?.length ? (item.media[0].startsWith('http')?item.media[0]:'/media/'+item.media[0]) : null);
-  const coverHtml = coverUrl
-    ? `<img class="item-cover" src="${coverUrl}" loading="lazy" alt="" onclick="lbOpen([${JSON.stringify(coverUrl)}],0);event.stopPropagation()">`
-    : '';
+
+  // Combine imageUrl + local media into one array
+  const allImgs=[
+    ...(item.imageUrl?[item.imageUrl]:[]),
+    ...(item.media||[]).map(m=>m.startsWith('http')?m:'/media/'+m),
+  ];
+  const imgsJson=allImgs.length?JSON.stringify(allImgs):'[]';
+
+  // Side thumbnail box (right-aligned)
+  const thumbHtml=allImgs.length?`<div class="item-thumb-box" id="tb-${item.id}"
+    data-imgs='${imgsJson}' data-idx="0"
+    onclick="lbOpenThumb(this);event.stopPropagation()">
+    <img class="item-thumb-img" src="${allImgs[0]}" loading="lazy" alt="" onload="fitThumb(this)">
+    ${allImgs.length>1?`
+      <div class="item-thumb-nav">
+        <button class="thnav-btn" onclick="thumbNav('${item.id}',-1,event)">‹</button>
+        <button class="thnav-btn" onclick="thumbNav('${item.id}',1,event)">›</button>
+      </div>
+      <div class="item-thumb-cnt">1/${allImgs.length}</div>`:''}
+  </div>`:'';
 
   // Tags (genres for Steam etc.)
   const tags=item.tags||[];
+  const links=item.links||[];
+  const steamLink=links.find(l=>l.style==='steam');
+  const otherLinks=links.filter(l=>l.style!=='steam');
+
+  // Tags always shown as itag bubbles
   const tagsHtml=tags.length?`<div class="item-tags">${tags.map(t=>`<span class="itag">${t}</span>`).join('')}</div>`:'';
 
-  // Links
-  const links=item.links||[];
-  const linksHtml=links.length?`<div class="item-links">${links.slice(0,3).map(l=>{
-    const isSteam=l.style==='steam';
-    return `<a class="ilink${isSteam?' steam':''}" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
-      ${isSteam
-        ? `<img src="/media/icons/steam_logo_icon.svg" width="10" height="10" style="opacity:.7">`
-        : `<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`}
-      ${l.label}</a>`;
-  }).join('')}</div>`:'';
-
-  // Local media thumbnails (skip if imageUrl already used as cover)
-  const media=(item.media||[]).filter(m=>!item.imageUrl);
-  let mediaHtml='';
-  if(media.length){
-    const show=media.slice(0,3), rest=media.length-3;
-    const allU=JSON.stringify(media.map(m=>m.startsWith('http')?m:'/media/'+m));
-    mediaHtml=`<div class="item-thumbs" onclick="event.stopPropagation()">`+
-      show.map((m,i)=>{ const src=m.startsWith('http')?m:'/media/'+m; return `<img class="thumb" src="${src}" loading="lazy" onclick="lbOpen(${allU},${i})" alt="">`;}).join('')+
-      (rest>0?`<div class="thumb-more" onclick="lbOpen(${allU},3)">+${rest}</div>`:'')+
-      `</div>`;
-  }
+  // Regular links (non-steam)
+  const linksHtml=otherLinks.length?`<div class="item-links">${otherLinks.slice(0,3).map(l=>`<a class="ilink" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
+    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    ${l.label}</a>`).join('')}</div>`:'';
 
   return `<div class="item-card ${cls}" id="ic-${item.id}" data-id="${item.id}" onclick="openModal('${item.id}')" style="animation-delay:${delay*28}ms">
-    ${coverHtml}
     <div class="item-inner">
       <div class="dot"></div>
       <div class="item-body">
@@ -745,9 +810,15 @@ function renderItem(item,delay){
           ${mine?'<span class="tag ta">мой подарок ✦</span>':''}
           ${bookerHtml}
         </div>`:''}
-        ${linksHtml}${mediaHtml}
+        ${linksHtml}
       </div>
+      ${thumbHtml}
     </div>
+    ${steamLink?`<a class="steam-open-btn" href="${steamLink.url}" target="_blank" onclick="event.stopPropagation()">
+      <img src="/media/icons/steam_logo_icon.svg" width="11" height="11" style="opacity:.65">
+      <span>Открыть в Steam</span>
+      <span class="steam-open-arr">→</span>
+    </a>`:''}
   </div>`;
 }
 
