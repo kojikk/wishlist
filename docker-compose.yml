@@ -4,10 +4,20 @@ services:
     container_name: tg-wishlist
     restart: unless-stopped
     ports:
-      - "3050:3000"
+      - "3050:3000"    # для прямого доступа во время разработки; продакшен ходит через Caddy
     volumes:
       - ./data:/app/data
       # Конфиг монтируем как volume — можно редактировать без rebuild
       - ./config:/app/config
     env_file:
       - .env
+    networks:
+      - wishnet
+
+networks:
+  # Внешняя сеть, созданная стеком wishlist-orchestrator (см. соответствующий
+  # docker-compose.yml). Поднимать оркестратор нужно ПЕРЕД вишлистом, либо
+  # вручную создать сеть: `docker network create wishnet`.
+  wishnet:
+    external: true
+    name: wishnet

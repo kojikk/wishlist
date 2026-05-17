@@ -120,6 +120,8 @@ docker compose up -d
 
 Приложение будет доступно на `http://localhost:3050`.
 
+> **Про docker-сеть `wishnet`:** compose-файл подключается к внешней сети `wishnet`. Она создаётся автоматически при первом запуске [wishlist-orchestrator](https://github.com/kojikk/wishlist-orchestrator). Если оркестратор не используется — создайте сеть руками один раз: `docker network create wishnet`.
+
 ### Обновление после изменений кода
 
 ```bash
