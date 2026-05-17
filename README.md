@@ -4,15 +4,39 @@
 
 ---
 
+## Оглавление
+
+- [Возможности](#возможности)
+- [Стек](#стек)
+- [Структура проекта](#структура-проекта)
+- [Быстрый старт (Docker)](#быстрый-старт-docker)
+- [Конфигурация](#конфигурация)
+- [Админ-панель](#админ-панель)
+- [Парсеры](#парсеры)
+  - [Steam](#steam)
+  - [OhMyWishes](#ohmywishes)
+  - [Добавление своего парсера](#добавление-своего-парсера)
+- [Кастомизация для форков](#кастомизация-для-форков)
+  - [Тема и цвета](#тема-и-цвета)
+  - [UI и вёрстка](#ui-и-вёрстка)
+- [Совместимость с оркестратором](#совместимость-с-оркестратором)
+  - [Стабильный контракт](#стабильный-контракт)
+  - [Внутренние эндпоинты](#внутренние-эндпоинты)
+- [API](#api)
+- [Локальная разработка](#локальная-разработка-без-docker)
+- [Развёртывание на сервере](#развёртывание-на-сервере)
+
+---
+
 ## Возможности
 
-- **Категории и желания** — структурированный список с поддержкой ссылок-магазинов для каждого желания
-- **Бронирование** — гость бронирует желание под своим Telegram-аккаунтом; другим гостям показывается, что оно уже занято
-- **Закреплённые ссылки** — произвольные ссылки вверху страницы (например, на внешний вишлист); Steam-ссылки получают особое оформление
-- **Парсер Steam** — автоматически подтягивает игры из вишлиста Steam в отдельную категорию; обновляется по расписанию
+- **Категории и желания** — структурированный список со ссылками на магазины для каждого желания
+- **Бронирование** — гость бронирует желание под своим Telegram-аккаунтом; другим показывается, что оно уже занято
+- **Закреплённые ссылки** — произвольные ссылки вверху страницы; Steam-ссылки получают особое оформление
+- **Парсеры внешних вишлистов** — Steam, OhMyWishes; легко добавить свой (auto-discovery)
 - **Информационные карточки** — блоки с текстом и контактами (например, «к кому обратиться за советом»)
 - **Горячая перезагрузка** — страница обновляется автоматически при изменении конфигов или обновлении данных парсера (SSE)
-- **Админ-панель** — редактирование вишлиста, drag-and-drop сортировка категорий, управление закреплёнными ссылками и парсерами, просмотр броней
+- **Админ-панель** — редактирование вишлиста, drag-and-drop сортировка, управление парсерами, просмотр броней
 
 ---
 
@@ -31,25 +55,28 @@
 
 ```
 wishlist-2/
-├── server.js              # Express-сервер, вся бизнес-логика
+├── server.js                 # Express-сервер, вся бизнес-логика
 ├── lib/
+│   ├── schema.js             # Контракт данных (Item/Category/Booking) + PROTOCOL_VERSION
 │   └── parsers/
-│       ├── index.js       # Реестр парсеров
-│       └── steam.js       # Steam wishlist парсер
+│       ├── index.js          # Auto-discovery парсеров
+│       ├── steam.js          # Steam Web API
+│       └── ohmywishes.js     # OhMyWishes JSON
 ├── public/
-│   ├── index.html         # Главная страница (Telegram Web App)
-│   ├── admin.html         # Админ-панель
-│   └── media/             # Изображения и иконки
+│   ├── theme.css             # Палитра — редактируйте, чтобы сменить цвета
+│   ├── index.html            # Главная страница (Telegram Web App)
+│   ├── admin.html            # Админ-панель
+│   └── media/                # Изображения и иконки
 ├── config/
-│   ├── app.json           # Настройки приложения (не в git)
-│   ├── wishlist.json      # Список желаний (не в git)
-│   ├── app.json.example   # Шаблон app.json
+│   ├── app.json              # Настройки приложения (не в git)
+│   ├── wishlist.json         # Список желаний (не в git)
+│   ├── app.json.example
 │   └── wishlist.json.example
 ├── data/
-│   └── wishlist.db        # SQLite (не в git, монтируется как volume)
+│   └── wishlist.db           # SQLite (не в git, монтируется как volume)
 ├── Dockerfile
 ├── docker-compose.yml
-├── .env                   # Переменные окружения (не в git)
+├── .env                      # Переменные окружения (не в git)
 └── .env.example
 ```
 
@@ -70,21 +97,20 @@ cd wishlist
 cp .env.example .env
 ```
 
-Отредактировать `.env` — обязательно задать `ADMIN_TOKEN`:
+Отредактируйте `.env` — обязательно задайте `ADMIN_TOKEN`:
 
 ```bash
-# Генерация случайного токена
-openssl rand -hex 32
+openssl rand -hex 32   # сгенерировать случайный токен
 ```
 
 ### 3. Создать конфиги
 
 ```bash
-cp config/app.json.example config/app.json
+cp config/app.json.example     config/app.json
 cp config/wishlist.json.example config/wishlist.json
 ```
 
-Отредактировать оба файла под свои данные (подробнее в разделе [Конфигурация](#конфигурация)).
+Отредактируйте оба файла под свои данные (подробнее в разделе [Конфигурация](#конфигурация)).
 
 ### 4. Запустить
 
@@ -112,12 +138,13 @@ docker compose logs -f
 
 ### `.env`
 
-| Переменная | По умолчанию | Описание |
+| Переменная | Обязательность | Описание |
 |---|---|---|
-| `PORT` | `3000` | Порт внутри контейнера |
-| `DB_PATH` | `/app/data/wishlist.db` | Путь к SQLite-файлу |
-| `ADMIN_TOKEN` | — | Токен для доступа к `/admin` и API. **Обязательно задать.** |
-| `NODE_ENV` | `production` | Режим запуска |
+| `PORT` | нет (default `3000`) | Порт внутри контейнера |
+| `DB_PATH` | нет (default `/app/data/wishlist.db`) | Путь к SQLite-файлу |
+| `ADMIN_TOKEN` | **да** | Токен для доступа к `/admin` и `/api/admin/*` |
+| `STEAM_API_KEY` | только если включён Steam-парсер | Ключ Steam Web API ([получить](https://steamcommunity.com/dev/apikey)) |
+| `NODE_ENV` | нет (default `production`) | Режим запуска |
 
 ### `config/app.json`
 
@@ -131,27 +158,26 @@ docker compose logs -f
       "id": "steam",          // Уникальный идентификатор
       "type": "steam",        // "steam" — особое оформление, "link" — обычная ссылка
       "label": "Вишлист в Steam",
-      "url": "https://store.steampowered.com/wishlist/id/YOUR_STEAM_ID/",
+      "url":  "https://store.steampowered.com/wishlist/id/YOUR_STEAM_ID/",
       "note": "Подпись под названием (необязательно)"
-    },
-    {
-      "id": "ozon",
-      "type": "link",
-      "icon": "🛒",           // Эмодзи-иконка (только для type: "link")
-      "label": "Ozon",
-      "url": "https://ozon.ru/...",
-      "note": ""
     }
   ],
 
-  // Парсеры внешних вишлистов
+  // Парсеры внешних вишлистов (см. раздел "Парсеры")
   "parsers": {
     "steam": {
       "enabled": true,
       "profile_url": "https://store.steampowered.com/wishlist/id/YOUR_STEAM_ID/",
       "category_emoji": "🎮",
       "category_title": "Steam",
-      "refresh_hours": 6      // Интервал автообновления в часах
+      "refresh_hours": 6
+    },
+    "ohmywishes": {
+      "enabled": false,
+      "profile_url": "https://ohmywishes.com/users/YOUR_USERNAME",
+      "category_emoji": "🎁",
+      "category_title": "OhMyWishes",
+      "refresh_hours": 16
     }
   },
 
@@ -161,18 +187,8 @@ docker compose logs -f
       "id": "gift",
       "icon": "🎁",
       "title": "Заголовок карточки",
-      "text": "Текст карточки",
+      "text":  "Текст карточки",
       "style": "accent"       // "accent" | "default" | "blue" | "green"
-    },
-    {
-      "id": "contacts",
-      "icon": "💬",
-      "title": "Спросите у близких",
-      "text": "Текст",
-      "style": "default",
-      "contacts": [           // Кнопки-ссылки на Telegram-контакты (необязательно)
-        { "username": "friend1", "label": "@friend1" }
-      ]
     }
   ]
 }
@@ -185,15 +201,15 @@ docker compose logs -f
 ```jsonc
 [
   {
-    "id": "electronics",      // Уникальный идентификатор категории
+    "id": "electronics",
     "emoji": "📱",
     "title": "Электроника",
-    "sub": "Подпись под категорией (необязательно)",
+    "sub":   "Подпись под категорией (необязательно)",
     "items": [
       {
-        "id": "item_1234",    // Уникальный идентификатор (используется для броней)
+        "id":   "item_1234",   // Уникальный идентификатор (используется для броней)
         "name": "Название желания",
-        "sub": "Уточнение или пожелание",
+        "sub":  "Уточнение или пожелание",
         "links": [
           { "label": "Купить на Ozon", "url": "https://ozon.ru/..." },
           { "label": "Wildberries",    "url": "https://wb.ru/..." }
@@ -205,6 +221,8 @@ docker compose logs -f
 ```
 
 > **Важно:** не меняйте `id` у уже созданных элементов — на них ссылаются брони в базе данных.
+
+Полное описание схемы — в [`lib/schema.js`](lib/schema.js).
 
 ---
 
@@ -219,7 +237,7 @@ docker compose logs -f
 - Drag-and-drop сортировка категорий за ручку `⠿`
 - Стрелки `↑ ↓` для сортировки элементов внутри категории
 - Автосохранение с задержкой 1.5 с после последнего изменения
-- Блок внешней категории Steam (если парсер включён) с кнопкой ручного обновления
+- Блоки внешних категорий (Steam, OhMyWishes…) с кнопкой ручного обновления
 
 **🔒 Брони**
 - Таблица всех активных броней: что забронировано, кем и когда
@@ -227,80 +245,186 @@ docker compose logs -f
 
 **⚙️ Настройки**
 - Редактирование закреплённых ссылок (порядок, тип, адрес, заметка)
-- Управление парсерами: включение/отключение, URL профиля, ручной запуск, статус последней загрузки
+- Управление парсерами: включение/отключение, URL, ручной запуск, статус последней загрузки
 
 ---
 
-## Парсер Steam
+## Парсеры
 
-При включении (`parsers.steam.enabled: true`) сервер:
+Парсер — это модуль, который превращает внешний источник (Steam, чужой сайт) в категорию вишлиста.
+Все парсеры автоматически обнаруживаются при старте: всё, что лежит в `lib/parsers/*.js` и
+экспортирует `{ fetch, meta }`, попадает в реестр.
 
-1. При старте запрашивает вишлист через Steam API (до 1500 игр, пагинация по 100)
-2. Сортирует игры по приоритету из вишлиста Steam
-3. Создаёт категорию «Steam» в памяти (не пишется в `wishlist.json`)
-4. Отправляет SSE-событие браузерам — страница обновляется без перезагрузки
-5. Повторяет шаги 1–4 каждые `refresh_hours` часов
+### Steam
 
-Поддерживаются форматы URL:
+Подтягивает вишлист из Steam через официальный Web API. Включается флагом `parsers.steam.enabled` в `app.json`.
+
+Поддерживаемые форматы URL:
 - `https://store.steampowered.com/wishlist/id/USERNAME/`
 - `https://store.steampowered.com/wishlist/profiles/STEAMID64/`
-- Просто `USERNAME` (будет развёрнуто автоматически)
+- Просто `USERNAME` (будет развёрнуто через ResolveVanityURL)
 
-### Добавление нового парсера
+Требуется `STEAM_API_KEY` в `.env`. Вишлист должен быть публичным.
 
-1. Создать файл `lib/parsers/mysite.js` с экспортом:
+### OhMyWishes
 
-```js
-async function fetch(cfg) {
-  // cfg — объект из app.json → parsers.mysite
-  // Вернуть массив:
-  return [
-    {
-      id: 'mysite_123',
-      name: 'Название товара',
-      sub: 'Уточнение',
-      links: [{ label: 'Купить', url: 'https://...' }],
-    },
-  ];
+Подтягивает списки желаний с публичного профиля ohmywishes.com. Многосписковый — каждый список становится отдельной категорией.
+
+URL: `https://ohmywishes.com/users/USERNAME`.
+
+### Добавление своего парсера
+
+1. Создайте файл `lib/parsers/myparser.js` со следующим экспортом:
+
+   ```js
+   'use strict';
+
+   async function fetch(cfg) {
+     // cfg — объект из config/app.json → parsers.myparser
+     // Вернуть один из вариантов:
+     //   (a) массив Item — будет одна категория
+     //   (b) массив Category — несколько категорий
+     return [
+       {
+         id:   'myparser_123',
+         name: 'Название товара',
+         sub:  'Уточнение',
+         imageUrl: 'https://...',
+         tags: ['tag1', 'tag2'],
+         links: [{ label: 'Купить', url: 'https://...' }],
+       },
+     ];
+   }
+
+   const meta = {
+     id: 'myparser',                                   // ОБЯЗАНО совпадать с именем файла
+     defaultTitle: 'My Site',
+     defaultEmoji: '🛒',
+     description:  'Импортирует желания с my-site.ru',
+     urlPlaceholder: 'https://my-site.ru/u/USERNAME',
+     requiresEnv:    [],                               // .env-переменные, без которых парсер не работает
+   };
+
+   module.exports = { fetch, meta };
+   ```
+
+   Формат Item/Category — см. [`lib/schema.js`](lib/schema.js). Можно прогнать данные через `validateItem`/`validateCategory` оттуда же, чтобы убедиться в корректности.
+
+2. Добавьте секцию в `config/app.json → parsers`:
+
+   ```json
+   "myparser": {
+     "enabled": true,
+     "profile_url": "https://my-site.ru/u/USERNAME",
+     "category_emoji": "🛒",
+     "category_title": "My Site",
+     "refresh_hours": 12
+   }
+   ```
+
+Никаких других правок не нужно — парсер появится в админке автоматически.
+
+---
+
+## Кастомизация для форков
+
+Цель архитектуры: форкер может менять стили, вёрстку и набор парсеров, не ломая
+[стабильный контракт](#совместимый-контракт) — а значит, оркестратор продолжает с ним работать.
+
+### Тема и цвета
+
+Все цвета вынесены в [`public/theme.css`](public/theme.css). Переменные с комментариями — меняйте только их.
+
+Пример: сменить акцентный цвет на сине-фиолетовый
+
+```css
+:root {
+  --ac:   #818cf8;
+  --adim: rgba(129,140,248,0.1);
+  --abr:  rgba(129,140,248,0.28);
 }
-
-module.exports = { fetch, defaultEmoji: '🛒', defaultTitle: 'My Site' };
 ```
 
-2. Зарегистрировать в `lib/parsers/index.js`:
+После сохранения файла страница обновится автоматически (SSE).
 
-```js
-const PARSERS = {
-  steam:  require('./steam'),
-  mysite: require('./mysite'), // добавить сюда
-};
-```
+Локальные нецветовые переменные (`--r` — радиус скругления, `--sw` — ширина сайдбара) остаются в `<style>` соответствующего HTML.
 
-3. Добавить секцию в `config/app.json → parsers`:
+### UI и вёрстка
+
+Главная и админ-панель — два самостоятельных HTML-файла (`public/index.html`, `public/admin.html`).
+Меняйте разметку, JS, шрифты как угодно — главное, не ломайте связь с публичными эндпоинтами
+(`/api/config`, `/api/bookings`, `/api/book`, `/api/unbook`), если хотите оставить совместимость с
+оркестратором.
+
+---
+
+## Совместимость с оркестратором
+
+Приложение спроектировано так, чтобы оркестратор (агрегатор нескольких вишлистов) мог работать с любым форком без правок, если форк сохраняет **стабильный контракт**.
+
+### Стабильный контракт
+
+Эти эндпоинты и формы их ответов считаются публичным API. Их нельзя ломать без bump `PROTOCOL_VERSION` в `lib/schema.js`.
+
+| Эндпоинт | Назначение |
+|---|---|
+| `GET /api/manifest` | Самоописание инстанса: версия протокола, имя, поддерживаемые фичи, список парсеров |
+| `GET /api/config` | Вишлист (категории и желания) + список парсеров, отображаемых на странице |
+| `GET /api/bookings` | Текущие брони `{ [item_id]: Booking }` |
+| `POST /api/book` | Забронировать `{ itemId, user }` |
+| `POST /api/unbook` | Снять бронь `{ itemId, user }` |
+| `GET /api/reload-stream` | SSE-поток для горячего обновления клиента |
+
+Схема `Item` / `Category` / `Booking` зафиксирована в [`lib/schema.js`](lib/schema.js). Поля могут только **добавляться** без bump версии; удаление и переименование полей — breaking change.
+
+Пример ответа `/api/manifest`:
 
 ```json
-"mysite": {
-  "enabled": true,
-  "wishlist_url": "https://mysite.ru/user/me/wishlist",
-  "category_emoji": "🛒",
-  "category_title": "My Site",
-  "refresh_hours": 12
+{
+  "protocolVersion": "1.0",
+  "name": "wishlist-mini-app",
+  "features": { "bookings": true, "sse": true, "parsers": true },
+  "sources": [
+    { "id": "steam",      "title": "Steam",      "emoji": "🎮", "description": "..." },
+    { "id": "ohmywishes", "title": "OhMyWishes", "emoji": "🎁", "description": "..." }
+  ],
+  "endpoints": {
+    "config":    "/api/config",
+    "bookings":  "/api/bookings",
+    "book":      "/api/book",
+    "unbook":    "/api/unbook",
+    "reloadSSE": "/api/reload-stream"
+  }
 }
 ```
+
+### Внутренние эндпоинты
+
+Всё под `/api/admin/*` — внутреннее. Форк свободен переписывать админку, менять формат сохраняемого конфига, добавлять/убирать эндпоинты под админкой. Оркестратор полагаться на них не должен.
+
+UI (`/`, `/admin`) — тоже внутреннее. Меняйте как угодно.
 
 ---
 
 ## API
 
-Все `/api/admin/*` эндпоинты требуют заголовок `x-admin-token: <ADMIN_TOKEN>`.
+### Stable (контракт для оркестраторов)
 
 | Метод | Путь | Описание |
 |---|---|---|
-| GET | `/api/config` | Весь конфиг (вишлист + данные парсеров + app) |
-| GET | `/api/bookings` | Все брони `{ [item_id]: { id, username, name, at } }` |
+| GET | `/api/manifest` | Манифест инстанса (см. выше) |
+| GET | `/api/config` | Вишлист + данные парсеров + app-конфиг (только чтение) |
+| GET | `/api/bookings` | Все брони `{ [item_id]: Booking }` |
 | POST | `/api/book` | Забронировать `{ itemId, user }` |
 | POST | `/api/unbook` | Отменить бронь `{ itemId, user }` |
-| GET | `/api/reload-stream` | SSE-поток для горячей перезагрузки |
+| GET | `/api/reload-stream` | SSE для горячей перезагрузки |
+
+### Internal (только для админки)
+
+Требуют заголовок `x-admin-token: <ADMIN_TOKEN>`.
+
+| Метод | Путь | Описание |
+|---|---|---|
 | GET | `/api/admin/wishlist` | Получить wishlist.json |
 | PUT | `/api/admin/wishlist` | Сохранить wishlist.json |
 | GET | `/api/admin/app-config` | Получить app.json |
@@ -317,11 +441,11 @@ const PARSERS = {
 
 ```bash
 npm install
-cp .env.example .env          # задать ADMIN_TOKEN
-cp config/app.json.example config/app.json
+cp .env.example .env                              # задать ADMIN_TOKEN
+cp config/app.json.example      config/app.json
 cp config/wishlist.json.example config/wishlist.json
 mkdir -p data
-npm run dev                   # node --watch (горячая перезагрузка сервера)
+npm run dev                                       # node --watch (горячая перезагрузка сервера)
 ```
 
 Приложение будет доступно на `http://localhost:3000`.

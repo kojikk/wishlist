@@ -6,17 +6,9 @@
 <title>Вишлист — Админ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Onest:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/theme.css">
 <style>
-:root{
-  --bg:#0f0f0f;--sf:#161616;--sf2:#1c1c1c;--sf3:#242424;
-  --br:rgba(255,255,255,.06);--br2:rgba(255,255,255,.12);
-  --tx:#f0ede8;--tx2:rgba(240,237,232,.5);--tx3:rgba(240,237,232,.22);
-  --ac:#e8c84a;--adim:rgba(232,200,74,.1);--abr:rgba(232,200,74,.3);
-  --gn:#4ade80;--gdim:rgba(74,222,128,.08);--gbr:rgba(74,222,128,.22);
-  --bl:#63b3ed;--bdim:rgba(99,179,237,.08);--bbr:rgba(99,179,237,.22);
-  --red:#f87171;--rdim:rgba(248,113,113,.08);--rbr:rgba(248,113,113,.22);
-  --r:10px;
-}
+:root{ --r:10px; }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
 
@@ -306,16 +298,20 @@ function renderWishlistEditor() {
 }
 
 function buildExternalBlock() {
-  const steamCfg = appConfig.parsers?.steam;
-  if (!steamCfg?.enabled) return '';
-  return `<div class="ext-block">
-    <div class="ext-header">
-      <span>${steamCfg.category_emoji||'🎮'} ${steamCfg.category_title||'Steam'}</span>
-      <span class="ext-badge">парсер</span>
-      <button class="tbtn sm" onclick="refreshParser('steam')" style="margin-left:auto">🔄 Обновить</button>
-    </div>
-    <div class="ext-info" id="steam-parser-info">Загрузка…</div>
-  </div>`;
+  const blocks = [];
+  for (const [id, cfg] of Object.entries(appConfig.parsers || {})) {
+    if (!cfg?.enabled) continue;
+    const label = (cfg.category_emoji ? cfg.category_emoji + ' ' : '') + (cfg.category_title || id);
+    blocks.push(`<div class="ext-block">
+      <div class="ext-header">
+        <span>${label}</span>
+        <span class="ext-badge">парсер</span>
+        <button class="tbtn sm" onclick="refreshParser('${id}')" style="margin-left:auto">🔄 Обновить</button>
+      </div>
+      <div class="ext-info" id="${id}-parser-info">Загрузка…</div>
+    </div>`);
+  }
+  return blocks.join('');
 }
 
 async function refreshParser(id) {
@@ -343,14 +339,13 @@ async function updateParserStatus() {
     if (!r.ok) return;
     const data = await r.json();
     for (const [id, info] of Object.entries(data)) {
-      const el = document.getElementById('pstat-' + id);
-      if (!el) continue;
-      if (info.itemCount !== null) {
-        const date = info.fetchedAt ? new Date(info.fetchedAt).toLocaleString('ru') : '—';
-        el.textContent = `${info.itemCount} позиций · обновлено ${date}`;
-      } else {
-        el.textContent = 'Ещё не загружено';
-      }
+      const text = info.itemCount !== null
+        ? `${info.itemCount} позиций · обновлено ${info.fetchedAt ? new Date(info.fetchedAt).toLocaleString('ru') : '—'}`
+        : 'Ещё не загружено';
+      ['pstat-' + id, id + '-parser-info'].forEach(eid => {
+        const el = document.getElementById(eid);
+        if (el) el.textContent = text;
+      });
     }
   } catch {}
 }

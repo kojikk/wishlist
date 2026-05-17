@@ -7,17 +7,9 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Onest:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/theme.css">
 <style>
-:root {
-  --bg:#0f0f0f; --sf:#161616; --sf2:#1c1c1c; --sf3:#232323;
-  --br:rgba(255,255,255,0.06); --br2:rgba(255,255,255,0.11);
-  --tx:#f0ede8; --tx2:rgba(240,237,232,0.5); --tx3:rgba(240,237,232,0.2);
-  --ac:#e8c84a; --adim:rgba(232,200,74,0.1); --abr:rgba(232,200,74,0.28);
-  --gn:#4ade80; --gdim:rgba(74,222,128,0.08); --gbr:rgba(74,222,128,0.22);
-  --bl:#63b3ed; --bdim:rgba(99,179,237,0.08); --bbr:rgba(99,179,237,0.2);
-  --red:#f87171;
-  --sw:220px; --r:11px;
-}
+:root { --sw:220px; --r:11px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-size:15px;line-height:1.5;min-height:100dvh;overscroll-behavior:none}
@@ -253,18 +245,19 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 /* ═══ ITEM TAGS ═══ */
 .item-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
 .itag{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500;background:rgba(99,179,237,.08);color:rgba(99,179,237,.7);border:1px solid rgba(99,179,237,.18)}
-/* ═══ STEAM OPEN BUTTON ═══ */
+/* ═══ MARKETPLACE OPEN BUTTONS ═══ */
 .steam-open-btn{
   display:flex;align-items:center;gap:6px;
   margin:8px -14px -11px;padding:7px 14px;
-  background:rgba(102,192,244,.06);border-top:1px solid rgba(102,192,244,.1);
-  color:rgba(198,212,223,.6);font-size:11px;font-weight:500;text-decoration:none;
+  border-top-width:1px;border-top-style:solid;
+  color:rgba(255,255,255,.45);font-size:11px;font-weight:500;text-decoration:none;
   transition:background .15s,color .15s;
   border-radius:0 0 var(--r) var(--r);
+  background:rgba(102,192,244,.06);border-top-color:rgba(102,192,244,.1);
 }
+.open-btn-arr{margin-left:auto;font-size:12px;opacity:.5;transition:transform .15s}
+.steam-open-btn:hover .open-btn-arr{transform:translateX(3px)}
 .steam-open-btn:hover{background:rgba(102,192,244,.12);color:#c6d4df}
-.steam-open-arr{margin-left:auto;font-size:12px;opacity:.5;transition:transform .15s}
-.steam-open-btn:hover .steam-open-arr{transform:translateX(3px)}
 
 /* ═══ ITEM SIDE THUMBNAIL ═══ */
 .item-thumb-box{
@@ -445,9 +438,9 @@ let curItem=null, reveal=false;
 let activeView='wishlist'; // 'wishlist' | 'steam' | 'ohmywishes'
 let viewCat={ wishlist:'all', steam:'all', ohmywishes:'all' };
 
-function mainCats()  { return WISHLIST.filter(c=>!c._external); }
-function steamCats() { return WISHLIST.filter(c=>c.source==='steam'); }
-function omwCats()   { return WISHLIST.filter(c=>c.source==='ohmywishes'); }
+function mainCats()   { return WISHLIST.filter(c=>!c._external); }
+function steamCats()  { return WISHLIST.filter(c=>c.source==='steam'); }
+function omwCats()    { return WISHLIST.filter(c=>c.source==='ohmywishes'); }
 function uniqueItems(cats){ const seen=new Set(); return cats.flatMap(c=>c.items).filter(i=>{ if(seen.has(i.id))return false; seen.add(i.id); return true; }); }
 
 // ── LIGHTBOX ─────────────────────────────────────────────────────────────────
@@ -553,7 +546,7 @@ async function refreshConfig(){
 function renderSidebar(){
   const nav=document.getElementById('sb-nav');
   if (activeView === 'steam') { nav.innerHTML=''; renderStats(); return; }
-  const cats = activeView === 'ohmywishes' ? omwCats() : mainCats();
+  const cats = activeView==='ohmywishes' ? omwCats() : mainCats();
   const all=[{id:'all',emoji:'✦',title:'Все',items:uniqueItems(cats)},...cats];
   nav.innerHTML=all.map(c=>{
     const bc=c.id==='all' ? cats.flatMap(x=>x.items).filter(i=>bookings[i.id]).length : c.items.filter(i=>bookings[i.id]).length;
@@ -568,7 +561,9 @@ function renderSidebar(){
 }
 
 function renderStats(){
-  const cats = activeView==='steam' ? steamCats() : activeView==='ohmywishes' ? omwCats() : mainCats();
+  const cats = activeView==='steam'      ? steamCats()
+             : activeView==='ohmywishes' ? omwCats()
+             : mainCats();
   const uniq=uniqueItems(cats);
   const total=uniq.length;
   const bc=uniq.filter(i=>bookings[i.id]).length;
@@ -593,9 +588,9 @@ function setCat(id){ activeCat=(activeCat===id?'all':id); viewCat[activeView]=ac
 function renderViewTabs() {
   const steamIcon = `<img style="width:15px;height:15px;opacity:.8" src="/media/icons/steam_logo_icon.svg">`;
   const views = [{ id:'wishlist', label:'Вишлист', icon:'✦', count: uniqueItems(mainCats()).length }];
-  const sc = steamCats(), oc = omwCats();
-  if (sc.length) views.push({ id:'steam', label:'Steam', icon:steamIcon, count: sc.reduce((s,c)=>s+c.items.length,0) });
-  if (oc.length) views.push({ id:'ohmywishes', label:'OhMyWishes', icon:'🎁', count: uniqueItems(oc).length });
+  const sc=steamCats(), oc=omwCats();
+  if (sc.length) views.push({ id:'steam',      label:'Steam',      icon:steamIcon, count: uniqueItems(sc).length });
+  if (oc.length) views.push({ id:'ohmywishes', label:'OhMyWishes', icon:'🎁',      count: uniqueItems(oc).length });
 
   if (activeView !== 'wishlist' && !views.find(v => v.id === activeView)) setView('wishlist');
 
@@ -747,6 +742,26 @@ function renderContentOMW() {
   attachSwipes();
 }
 
+function renderContentList(cats, emptyMsg) {
+  const el=document.getElementById('content');
+  const emp=document.getElementById('empty');
+  const q=query.toLowerCase().trim();
+
+  if(!cats.length){ el.innerHTML=`<div style="padding:60px 20px;text-align:center;color:var(--tx3);font-size:14px">${emptyMsg}</div>`; emp.style.display='none'; return; }
+
+  const filtered=cats
+    .filter(c=> activeCat==='all' || c.id===activeCat)
+    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q))}))
+    .filter(c=>c.items.length>0);
+
+  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
+  emp.style.display='none';
+
+  filtered.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
+  el.innerHTML=filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
+  attachSwipes();
+}
+
 function renderContent() {
   if (activeView === 'steam')      return renderContentSteam();
   if (activeView === 'ohmywishes') return renderContentOMW();
@@ -817,7 +832,7 @@ function renderItem(item,delay){
     ${steamLink?`<a class="steam-open-btn" href="${steamLink.url}" target="_blank" onclick="event.stopPropagation()">
       <img src="/media/icons/steam_logo_icon.svg" width="11" height="11" style="opacity:.65">
       <span>Открыть в Steam</span>
-      <span class="steam-open-arr">→</span>
+      <span class="open-btn-arr">→</span>
     </a>`:''}
   </div>`;
 }

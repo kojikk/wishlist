@@ -6,6 +6,7 @@ const sqlite3  = require('sqlite3').verbose();
 const path     = require('path');
 const fs       = require('fs');
 const PARSERS  = require('./lib/parsers');
+const { PROTOCOL_VERSION } = require('./lib/schema');
 
 const PORT        = process.env.PORT        || 3000;
 const DB_PATH     = process.env.DB_PATH     || path.join(__dirname, 'data', 'wishlist.db');
@@ -174,7 +175,44 @@ app.get('/api/reload-stream', (req, res) => {
   req.on('close', () => { sseClients.delete(res); clearInterval(ka); });
 });
 
-// ─── Public API ──────────────────────────────────────────────────────────────
+// ─── Stable API (контракт для оркестраторов и других внешних клиентов) ──────
+//
+// ВНИМАНИЕ: эндпоинты в этой секции и формы их ответов считаются ПУБЛИЧНЫМ
+// КОНТРАКТОМ. Несовместимое изменение требует bump PROTOCOL_VERSION в
+// lib/schema.js. Форки СВОБОДНЫ изменять /api/admin/* и UI, но обязаны
+// сохранять контракт ниже, если хотят оставаться совместимыми с оркестратором.
+
+app.get('/api/manifest', (req, res) => {
+  let appName = 'Wishlist';
+  try {
+    appName = require('./package.json').name || appName;
+  } catch {}
+
+  const sources = Object.entries(PARSERS).map(([id, mod]) => ({
+    id,
+    title: mod.meta?.defaultTitle || id,
+    emoji: mod.meta?.defaultEmoji || '',
+    description: mod.meta?.description || '',
+  }));
+
+  res.json({
+    protocolVersion: PROTOCOL_VERSION,
+    name: appName,
+    features: {
+      bookings: true,
+      sse:      true,
+      parsers:  Object.keys(PARSERS).length > 0,
+    },
+    sources,
+    endpoints: {
+      config:     '/api/config',
+      bookings:   '/api/bookings',
+      book:       '/api/book',
+      unbook:     '/api/unbook',
+      reloadSSE:  '/api/reload-stream',
+    },
+  });
+});
 
 app.get('/api/config', (req, res) => {
   try {
