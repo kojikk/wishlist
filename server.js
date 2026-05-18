@@ -143,7 +143,7 @@ const dbRun = (sql, p=[]) => new Promise((res,rej) => db.run(sql, p, function(e)
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 const app = express();
-app.use(express.json({ limit: '4mb' }));
+app.use(express.json({ limit: '20mb' }));
 app.use(express.static(PUBLIC_DIR, {
   setHeaders(res, filePath) {
     if (filePath.endsWith('.html')) {
@@ -358,7 +358,7 @@ app.post('/api/admin/parsers/:id/refresh', adminAuth, async (req, res) => {
 const UPLOADS_DIR = path.join(PUBLIC_DIR, 'uploads');
 const ALLOWED_IMG_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
 
-app.post('/api/admin/upload', adminAuth, express.json({ limit: '20mb' }), (req, res) => {
+app.post('/api/admin/upload', adminAuth, (req, res) => {
   const { filename, data } = req.body || {};
   if (!filename || !data) return res.status(400).json({ error: 'filename and data required' });
   const ext = path.extname(filename).toLowerCase();

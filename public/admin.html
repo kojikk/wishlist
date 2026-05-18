@@ -97,9 +97,12 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .cat-block.expanded .cat-body{display:block}
 
 /* ITEM ROW */
-.item-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--br)}
+.item-row{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--br)}
 .item-row:last-child{border-bottom:none}
-.item-move{display:flex;flex-direction:column;gap:1px;flex-shrink:0;padding-top:6px}
+.item-move{display:flex;flex-direction:column;gap:1px;flex-shrink:0;padding-top:10px}
+.item-thumb-col{width:56px;flex-shrink:0}
+.item-thumb{width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid var(--br);display:block}
+.item-thumb-empty{width:56px;height:56px;border-radius:8px;border:1px dashed var(--br);display:flex;align-items:center;justify-content:center;font-size:20px;opacity:.3;background:var(--sf2)}
 .item-move button{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:11px;line-height:1.2;padding:1px 3px;border-radius:3px;transition:.13s}
 .item-move button:hover:not(:disabled){color:var(--tx);background:var(--sf3)}
 .item-move button:disabled{opacity:.2;cursor:default}
@@ -249,7 +252,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 @media(min-width:721px){
   .mob-tabs,.mob-fab,.mob-item-screen{display:none!important}
   .mob-item-display,.mob-item-arr{display:none!important}
-  .cat-edit-hint{display:none!important}
+  .cat-edit-hint,.item-thumb-col{display:none!important}
 }
 
 /* Bottom tabs */
@@ -576,11 +579,17 @@ function renderItemRow(ci, ii, item, total) {
       <button class="link-del" onclick="deleteLink(${ci},${ii},${li})">✕</button>
     </div>`).join('');
 
+  const imgUrl = (item.media||[]).find(m => m.startsWith('/uploads/') || /\.(jpe?g|png|webp|gif|avif)$/i.test(m));
+  const thumbHtml = imgUrl
+    ? `<img class="item-thumb" src="${esc(imgUrl)}" onerror="this.outerHTML='<div class=item-thumb-empty>📷</div>'">`
+    : `<div class="item-thumb-empty">📷</div>`;
+
   return `<div class="item-row" id="ir-${ci}-${ii}" onclick="if(window.innerWidth<=720){event.preventDefault();openItemScreen(${ci},${ii})}">
     <div class="item-move">
       <button onclick="moveItem(${ci},${ii},-1)" ${ii===0?'disabled':''}>↑</button>
       <button onclick="moveItem(${ci},${ii},1)" ${ii===total-1?'disabled':''}>↓</button>
     </div>
+    <div class="item-thumb-col">${thumbHtml}</div>
     <div class="item-fields">
       <div class="mob-item-display">
         <div class="mob-item-name">${esc(item.name || 'Без названия')}</div>
@@ -589,21 +598,12 @@ function renderItemRow(ci, ii, item, total) {
       <div class="item-row-top">
         <input class="item-name-inp" value="${esc(item.name||'')}" placeholder="Название желания"
           onchange="setItemField(${ci},${ii},'name',this.value)">
-        <input class="item-sub-inp" value="${esc(item.sub||'')}" placeholder="Уточнение"
+        <input class="item-sub-inp" value="${esc(item.sub||'')}" placeholder="Уточнение / цена"
           onchange="setItemField(${ci},${ii},'sub',this.value)">
       </div>
       <div class="item-links-area">
         ${links}
         <button class="add-link-btn" onclick="addLink(${ci},${ii})">+ ссылка</button>
-      </div>
-      <div class="item-media-area">
-        ${(item.media||[]).map((m,mi)=>`<span class="media-chip">
-          <span class="media-chip-label" title="${esc(m)}">${m.length>28?m.slice(0,26)+'…':m}</span>
-          <button onclick="removeMedia(${ci},${ii},${mi})">✕</button>
-        </span>`).join('')}
-        <input class="media-add-inp" placeholder="+ фото: URL или имя файла, Enter"
-          onkeydown="if(event.key==='Enter'&&this.value.trim()){addMedia(${ci},${ii},this.value);this.value=''}"
-          onblur="if(this.value.trim()){addMedia(${ci},${ii},this.value);this.value=''}">
       </div>
     </div>
     <span class="mob-item-arr">✎</span>
@@ -1058,7 +1058,7 @@ function openItemScreen(ci, ii) {
   ).join('');
 
   // Hero photo
-  const firstPhoto = (item.media||[]).find(m => /\.(jpe?g|png|webp|gif|avif)$/i.test(m) || m.startsWith('/uploads/') || m.startsWith('http'));
+  const firstPhoto = [...(item.media||[])].reverse().find(m => m.startsWith('/uploads/') || /\.(jpe?g|png|webp|gif|avif)$/i.test(m));
   const photoHtml = firstPhoto
     ? `<img class="mis-photo-bg" src="${esc(firstPhoto)}" onerror="this.style.display='none'">
        <div class="mis-photo-overlay">

@@ -1,7 +1,7 @@
 FROM node:20-alpine
 
 # Chromium и системные зависимости для Playwright
-RUN apk add --no-cache \
+RUN apk update && apk add --no-cache \
     chromium \
     nss \
     freetype \

@@ -895,7 +895,7 @@ function renderGridCard(item, delay) {
   const cls = bk ? (mine ? 'mine' : 'booked') : '';
   const allImgs = [
     ...(item.imageUrl ? [item.imageUrl] : []),
-    ...(item.media || []).map(m => m.startsWith('http') ? m : '/media/' + m),
+    ...(item.media || []).map(m => m.startsWith('http') || m.startsWith('/') ? m : '/media/' + m),
   ];
   const links = item.links || [];
   const buyLink = links[0];
@@ -1107,7 +1107,7 @@ function renderItem(item,delay){
 
   const allImgs=[
     ...(item.imageUrl?[item.imageUrl]:[]),
-    ...(item.media||[]).map(m=>m.startsWith('http')?m:'/media/'+m),
+    ...(item.media||[]).map(m=>m.startsWith('http')||m.startsWith('/')?m:'/media/'+m),
   ];
   const imgsJson=allImgs.length?JSON.stringify(allImgs):'[]';
 
@@ -1241,7 +1241,7 @@ function openModal(itemId){
   const media=item.media||[];
   const allImgs=[
     ...(item.imageUrl?[item.imageUrl]:[]),
-    ...media.map(m=>m.startsWith('http')?m:'/media/'+m),
+    ...media.map(m=>m.startsWith('http')||m.startsWith('/')?m:'/media/'+m),
   ];
   const mediaHtml=allImgs.length?`<div class="m-media">${
     allImgs.map((src,i)=>`<img src="${src}" onclick="lbOpen(${JSON.stringify(allImgs)},${i})" alt="">`)
