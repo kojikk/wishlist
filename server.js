@@ -5,12 +5,14 @@ const express  = require('express');
 const sqlite3  = require('sqlite3').verbose();
 const path     = require('path');
 const fs       = require('fs');
+const crypto   = require('crypto');
 const PARSERS  = require('./lib/parsers');
 const { PROTOCOL_VERSION } = require('./lib/schema');
 
 const PORT        = process.env.PORT        || 3000;
 const DB_PATH     = process.env.DB_PATH     || path.join(__dirname, 'data', 'wishlist.db');
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN || null;
+const ADMIN_TOKEN         = process.env.ADMIN_TOKEN         || null;
+const TELEGRAM_BOT_TOKEN  = process.env.TELEGRAM_BOT_TOKEN  || null;
 const CONFIG_DIR  = path.join(__dirname, 'config');
 const PUBLIC_DIR  = path.join(__dirname, 'public');
 
@@ -120,6 +122,26 @@ if (fs.existsSync(indexPath)) {
   });
 }
 
+// ─── TG Session Auth ─────────────────────────────────────────────────────────
+
+const tgSessions = new Map();
+
+function validateTelegramInitData(initData) {
+  if (!TELEGRAM_BOT_TOKEN) return null;
+  const params = new URLSearchParams(initData);
+  const hash = params.get('hash');
+  if (!hash) return null;
+  params.delete('hash');
+  const sorted = [...params.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k}=${v}`)
+    .join('\n');
+  const secret = crypto.createHmac('sha256', 'WebAppData').update(TELEGRAM_BOT_TOKEN).digest();
+  const expected = crypto.createHmac('sha256', secret).update(sorted).digest('hex');
+  if (expected !== hash) return null;
+  try { return JSON.parse(params.get('user') || 'null'); } catch { return null; }
+}
+
 // ─── DB ──────────────────────────────────────────────────────────────────────
 
 const db = new sqlite3.Database(DB_PATH, err => {
@@ -153,6 +175,12 @@ app.use(express.static(PUBLIC_DIR, {
 }));
 
 function adminAuth(req, res, next) {
+  const tgSession = req.headers['x-tg-session'];
+  if (tgSession) {
+    const sess = tgSessions.get(tgSession);
+    if (sess && sess.expiresAt > Date.now()) return next();
+    return res.status(401).json({ error: 'TG session expired or invalid' });
+  }
   if (!ADMIN_TOKEN) return res.status(403).json({ error: 'ADMIN_TOKEN not configured' });
   const token = req.headers['x-admin-token'] || req.query.token;
   if (token !== ADMIN_TOKEN) return res.status(401).json({ error: 'Unauthorized' });
@@ -173,6 +201,23 @@ app.get('/api/reload-stream', (req, res) => {
   const ka = setInterval(() => { try { res.write(': ping\n\n'); } catch {} }, 25000);
   sseClients.add(res);
   req.on('close', () => { sseClients.delete(res); clearInterval(ka); });
+});
+
+// ─── TG Auth endpoint ────────────────────────────────────────────────────────
+
+app.post('/api/auth/tg', (req, res) => {
+  if (!TELEGRAM_BOT_TOKEN) return res.status(403).json({ error: 'Telegram auth not configured' });
+  const { initData } = req.body || {};
+  if (!initData) return res.status(400).json({ error: 'initData required' });
+  const user = validateTelegramInitData(initData);
+  if (!user) return res.status(401).json({ error: 'Invalid initData' });
+  const { app: appCfg } = loadConfig();
+  const admins = (appCfg.admins || []).map(a => a.toLowerCase());
+  const username = (user.username || '').toLowerCase();
+  if (!admins.includes(username)) return res.status(403).json({ error: 'Not in admins list' });
+  const sessionId = crypto.randomUUID();
+  tgSessions.set(sessionId, { username, expiresAt: Date.now() + 24 * 3_600_000 });
+  res.json({ ok: true, sessionId });
 });
 
 // ─── Stable API (контракт для оркестраторов и других внешних клиентов) ──────

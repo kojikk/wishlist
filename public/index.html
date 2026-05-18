@@ -403,6 +403,46 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .scroll-top{position:fixed;bottom:24px;right:22px;width:36px;height:36px;border-radius:50%;background:var(--sf2);border:1px solid var(--br);color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transition:all .2s;font-size:16px;z-index:50}
 .scroll-top.on{opacity:1;pointer-events:all}
 
+/* ═══ ADMIN MODE ═══ */
+.adm{display:none!important}
+body.admin-mode .adm{display:flex!important}
+#adm-toggle{position:fixed;bottom:68px;right:18px;z-index:900;width:38px;height:38px;border-radius:50%;background:var(--sf2);border:1px solid var(--br2);cursor:pointer;font-size:16px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.45);color:var(--tx2);transition:.2s}
+#adm-toggle.visible{display:flex}
+#adm-toggle.active{background:var(--ac);border-color:transparent;color:#0f0f0f}
+.item-card{position:relative}
+.adm-item-pencil{position:absolute;bottom:7px;right:7px;width:26px;height:26px;border-radius:50%;background:var(--ac);border:none;cursor:pointer;font-size:11px;color:#0f0f0f;z-index:5;align-items:center;justify-content:center}
+.adm-cat-add{width:22px;height:22px;border-radius:50%;background:var(--ac);border:none;cursor:pointer;font-size:15px;line-height:1;color:#0f0f0f;flex-shrink:0;margin-left:6px;align-items:center;justify-content:center}
+.pinned-link,.steam-card{position:relative}
+.adm-pl-pencil{position:absolute;top:7px;right:7px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12);cursor:pointer;font-size:11px;color:rgba(255,255,255,.7);z-index:5;align-items:center;justify-content:center}
+.adm-title-pencil{display:none;width:20px;height:20px;border-radius:4px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--tx3);align-items:center;justify-content:center;vertical-align:middle;margin-left:4px}
+body.admin-mode .adm-title-pencil{display:inline-flex}
+#adm-add-cat-btn{margin:14px 0 4px;display:none;align-items:center;justify-content:center;gap:8px;padding:11px 20px;background:var(--sf);border:1px dashed var(--br2);border-radius:10px;cursor:pointer;color:var(--tx2);font-size:13px;font-family:'Onest',sans-serif;width:100%}
+body.admin-mode #adm-add-cat-btn{display:flex}
+#adm-item-screen{position:fixed;inset:0;z-index:1200;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+#adm-item-screen.on{transform:translateX(0)}
+.adm-screen-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--br);flex-shrink:0}
+.adm-screen-back{width:36px;height:36px;border-radius:50%;background:var(--sf2);border:none;cursor:pointer;font-size:18px;color:var(--tx2);display:flex;align-items:center;justify-content:center}
+.adm-screen-title{flex:1;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.adm-screen-del{width:36px;height:36px;border-radius:50%;background:rgba(255,80,80,.12);border:none;cursor:pointer;font-size:14px;color:#ff5050;display:flex;align-items:center;justify-content:center}
+.adm-screen-body{flex:1;overflow-y:auto;padding:16px 16px 40px}
+.adm-fld{margin-bottom:16px}
+.adm-fld label{display:block;font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.adm-inp{width:100%;background:var(--sf2);border:1px solid var(--br2);border-radius:8px;padding:10px 14px;font-family:'Onest',sans-serif;font-size:14px;color:var(--tx);outline:none;transition:border-color .2s}
+.adm-inp:focus{border-color:var(--ac)}
+.adm-photo-area{width:100%;height:116px;border:1.5px dashed var(--br2);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden}
+.adm-photo-area.has-photo{border-style:solid}
+.adm-photo-placeholder{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--tx3)}
+.adm-photo-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;gap:6px;color:#fff}
+.adm-save-btn{width:100%;padding:13px;border-radius:10px;border:none;background:var(--ac);color:#0f0f0f;font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px}
+.adm-ov{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.adm-ov.on{opacity:1;pointer-events:all}
+.adm-sheet{background:var(--sf);border-radius:18px 18px 0 0;padding:24px 20px 40px;width:100%;max-width:520px;transform:translateY(20px);transition:transform .22s}
+.adm-ov.on .adm-sheet{transform:translateY(0)}
+.adm-sheet-title{font-size:15px;font-weight:600;margin-bottom:16px}
+.adm-sheet-btn{width:100%;padding:13px;border-radius:10px;border:none;background:var(--ac);color:#0f0f0f;font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.adm-sheet-btn.muted{background:var(--sf2);color:var(--tx2)}
+.adm-sheet-btn.danger{background:rgba(255,80,80,.12);color:#ff5050}
+
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:720px){
   .sidebar{display:none}
@@ -554,6 +594,41 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 <div class="toast" id="toast"></div>
 <div class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
 
+<button id="adm-toggle" onclick="toggleAdminMode()">✎</button>
+
+<div id="adm-item-screen">
+  <div class="adm-screen-head">
+    <button class="adm-screen-back" onclick="admCloseItemEditor()">←</button>
+    <span class="adm-screen-title" id="adm-editor-title">Желание</span>
+    <button class="adm-screen-del" onclick="admDeleteItem()">🗑</button>
+  </div>
+  <div class="adm-screen-body" id="adm-editor-body"></div>
+</div>
+
+<div class="adm-ov" id="adm-conf-ov" onclick="admCloseConfirm(false)">
+  <div class="adm-sheet" onclick="event.stopPropagation()">
+    <div id="adm-conf-msg" class="adm-sheet-title"></div>
+    <div id="adm-conf-sub" style="font-size:13px;color:var(--tx2);margin-bottom:20px"></div>
+    <button id="adm-conf-ok" class="adm-sheet-btn danger" onclick="admCloseConfirm(true)">Удалить</button>
+    <button class="adm-sheet-btn muted" onclick="admCloseConfirm(false)" style="margin-top:8px">Отмена</button>
+  </div>
+</div>
+
+<div class="adm-ov" id="adm-inp-ov" onclick="admInpSheetClose()">
+  <div class="adm-sheet" onclick="event.stopPropagation()">
+    <div id="adm-inp-sheet-title" class="adm-sheet-title"></div>
+    <div id="adm-inp-emoji-row" style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+      <span style="font-size:13px;color:var(--tx2);flex-shrink:0">Emoji</span>
+      <input id="adm-inp-emoji-val" class="adm-inp" style="width:60px;font-size:22px;text-align:center;padding:6px" value="📦">
+    </div>
+    <input id="adm-inp-val" class="adm-inp" style="margin-bottom:8px" placeholder="">
+    <input id="adm-inp-url" class="adm-inp" placeholder="https://…" style="margin-bottom:8px;display:none">
+    <input id="adm-inp-note" class="adm-inp" placeholder="Заметка" style="margin-bottom:16px;display:none">
+    <button class="adm-sheet-btn" onclick="admInpSheetOk()">Сохранить</button>
+    <button class="adm-sheet-btn muted" onclick="admInpSheetClose()" style="margin-top:8px">Отмена</button>
+  </div>
+</div>
+
 <script>
 // ── TG ──────────────────────────────────────────────────────────────────────
 const tg = window.Telegram?.WebApp;
@@ -645,6 +720,7 @@ async function init(){
     openSecs=new Set(mainCats().map(c=>c.id));
     renderViewTabs(); renderSidebar(); renderMobCats(); renderStats(); renderContent();
     updateFilterUI();
+    initAdminAuth();
   } catch(e) {
     console.error(e);
     document.getElementById('content').innerHTML=`<div style="padding:24px;color:var(--tx2);font-size:13px;line-height:1.6">
@@ -679,6 +755,9 @@ async function refreshConfig(){
 
 // ── SIDEBAR ──────────────────────────────────────────────────────────────────
 function renderSidebar(){
+  const title=CFG.title||'Вишлист';
+  const logoInner=`${esc(title)} <em>✦</em><button class="adm-title-pencil" onclick="admEditTitle()">✎</button>`;
+  ['.sb-logo','.mob-logo'].forEach(s=>{const el=document.querySelector(s);if(el)el.innerHTML=logoInner;});
   const nav=document.getElementById('sb-nav');
   if (activeView === 'steam') { nav.innerHTML=''; renderStats(); return; }
   const cats = activeView==='ohmywishes' ? omwCats() : activeView==='ozon' ? ozonCats() : mainCats();
@@ -866,10 +945,12 @@ function setView(id) {
 }
 
 // ── PINNED LINKS ──────────────────────────────────────────────────────────────
-function renderPinnedLink(link, delay){
+function renderPinnedLink(link, delay, li){
   const anim = `animation-delay:${delay*60}ms`;
+  const pencil = `<button class="adm adm-pl-pencil" onclick="event.preventDefault();event.stopPropagation();admEditPinnedLink(${li})">✎</button>`;
   if(link.type==='steam'){
     return `<a class="steam-card" href="${link.url}" target="_blank" style="${anim}">
+      ${pencil}
       <div class="steam-logo"><img src="/media/icons/steam_logo_icon.svg" width="24" height="24"></div>
       <div>
         <div class="steam-name">${link.label||'Steam'}</div>
@@ -879,6 +960,7 @@ function renderPinnedLink(link, delay){
     </a>`;
   }
   return `<a class="pinned-link" href="${link.url}" target="_blank" style="${anim}">
+    ${pencil}
     ${link.icon?`<div class="pl-icon">${link.icon}</div>`:''}
     <div>
       <div class="pl-name">${link.label}</div>
@@ -951,6 +1033,7 @@ function renderSection(cat, ci) {
         <span class="badge bn">${cat.items.length}</span>
       </div>
       <div class="sec-arr ${isOpen?'op':''}" id="arr-${cat.id}">▶</div>
+      <button class="adm adm-cat-add" onclick="event.stopPropagation();admNewItem('${cat.id}')">+</button>
     </div>
     <div class="items-list ${isOpen?'op':''}" id="il-${cat.id}" style="max-height:${estHeight}">
       ${catMediaHtml}
@@ -975,7 +1058,7 @@ function renderContentWishlist() {
   let topHtml='';
   if(!q&&activeCat==='all'){
     const parts=[];
-    (CFG.pinned_links||[]).forEach((lnk,i)=>parts.push(renderPinnedLink(lnk,i)));
+    (CFG.pinned_links||[]).forEach((lnk,i)=>parts.push(renderPinnedLink(lnk,i,i)));
     (CFG.info_cards||[]).forEach((card,i)=>{
       const n=parts.length;
       const contacts=(card.contacts||[]).map(c=>`<a href="https://t.me/${c.username}" class="ic-chip">${c.label}</a>`).join('');
@@ -991,7 +1074,7 @@ function renderContentWishlist() {
     if(parts.length) topHtml=`<div class="top-cards">${parts.join('')}</div>`;
   }
 
-  el.innerHTML=topHtml+filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
+  el.innerHTML=topHtml+filtered.map((cat,ci)=>renderSection(cat,ci)).join('')+`<button id="adm-add-cat-btn" onclick="admAddCat()">+ Добавить категорию</button>`;
   attachSwipes();
   afterRender();
 }
@@ -1135,6 +1218,7 @@ function renderItem(item,delay){
     ${l.label}</a>`).join('')}</div>`:'';
 
   return `<div class="item-card ${cls}" id="ic-${item.id}" data-id="${item.id}" onclick="openModal('${item.id}')" style="animation-delay:${delay*28}ms">
+    <button class="adm adm-item-pencil" onclick="event.stopPropagation();admOpenItemEditor('${item.id}')">✎</button>
     <div class="item-inner">
       <div class="dot"></div>
       <div class="item-body">
@@ -1330,6 +1414,255 @@ document.getElementById('mob-search-inp').addEventListener('input',function(){ o
 window.addEventListener('scroll',()=>{
   document.getElementById('scroll-top').classList.toggle('on',window.scrollY>300);
 });
+
+// ── ADMIN MODE ────────────────────────────────────────────────────────────────
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+let adminSession=null, adminMode=false, isAdminUser=false;
+let admEditCi=-1, admEditIi=-1;
+
+function admHeaders(){
+  const h={'Content-Type':'application/json'};
+  if(adminSession) h['x-tg-session']=adminSession;
+  return h;
+}
+
+async function initAdminAuth(){
+  if(!tg?.initData) return;
+  try{
+    const r=await fetch('/api/auth/tg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData})});
+    if(!r.ok) return;
+    const d=await r.json();
+    if(d.ok&&d.sessionId){ adminSession=d.sessionId; isAdminUser=true; document.getElementById('adm-toggle').classList.add('visible'); }
+  }catch{}
+}
+
+function toggleAdminMode(){
+  adminMode=!adminMode;
+  document.body.classList.toggle('admin-mode',adminMode);
+  const btn=document.getElementById('adm-toggle');
+  btn.classList.toggle('active',adminMode);
+  btn.textContent=adminMode?'✓':'✎';
+  haptic('medium');
+  renderContent();
+}
+
+async function admSaveWishlist(){
+  try{
+    const r=await fetch('/api/admin/wishlist',{method:'PUT',headers:admHeaders(),body:JSON.stringify(mainCats())});
+    if(!r.ok) throw new Error((await r.json()).error||r.status);
+  }catch(e){showToast('Ошибка: '+e.message);}
+}
+
+async function admSaveApp(){
+  try{
+    const r=await fetch('/api/admin/app-config',{method:'PUT',headers:admHeaders(),body:JSON.stringify(CFG)});
+    if(!r.ok) throw new Error((await r.json()).error||r.status);
+  }catch(e){showToast('Ошибка: '+e.message);}
+}
+
+function admFindPos(itemId){
+  for(let ci=0;ci<WISHLIST.length;ci++){
+    if(WISHLIST[ci]._external) continue;
+    const ii=WISHLIST[ci].items.findIndex(x=>x.id===itemId);
+    if(ii>=0) return{ci,ii};
+  }
+  return null;
+}
+
+function admOpenItemEditor(itemId){
+  const p=admFindPos(itemId); if(!p) return;
+  admEditCi=p.ci; admEditIi=p.ii; _admRenderEditor();
+}
+
+function admNewItem(catId){
+  const ci=WISHLIST.findIndex(c=>c.id===catId&&!c._external); if(ci<0) return;
+  const item={id:'item_'+Date.now(),name:'',sub:'',media:[],links:[]};
+  WISHLIST[ci].items.push(item);
+  admEditCi=ci; admEditIi=WISHLIST[ci].items.length-1; _admRenderEditor();
+}
+
+function _admRenderEditor(){
+  const ci=admEditCi,ii=admEditIi;
+  const item=WISHLIST[ci]?.items[ii]; if(!item) return;
+  const localCats=WISHLIST.filter(c=>!c._external);
+  const catOpts=localCats.map(c=>{
+    const ri=WISHLIST.indexOf(c);
+    return `<option value="${ri}"${ri===ci?' selected':''}>${esc(c.emoji||'📦')} ${esc(c.title||'Категория')}</option>`;
+  }).join('');
+  const firstPhoto=[...(item.media||[])].reverse().find(m=>m.startsWith('/uploads/')||/\.(jpe?g|png|webp|gif|avif)$/i.test(m));
+  const photoHtml=firstPhoto
+    ?`<img src="${esc(firstPhoto)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+      <div class="adm-photo-overlay"><span style="font-size:22px">📷</span><span style="font-size:12px;margin-left:6px">Изменить</span></div>`
+    :`<div class="adm-photo-placeholder"><span style="font-size:28px">📷</span><span style="font-size:12px;margin-top:4px">Добавить фото</span></div>`;
+  const linksHtml=(item.links||[]).map((l,li)=>`
+    <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
+      <input class="adm-inp" style="flex:1;min-width:0" placeholder="Текст" value="${esc(l.label||'')}"
+        oninput="WISHLIST[${ci}].items[${ii}].links[${li}].label=this.value">
+      <input class="adm-inp" style="flex:2;min-width:0" placeholder="https://…" value="${esc(l.url||'')}"
+        oninput="WISHLIST[${ci}].items[${ii}].links[${li}].url=this.value">
+      <button style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:rgba(255,80,80,.12);border:none;cursor:pointer;color:#ff5050;font-size:14px"
+        onclick="WISHLIST[${ci}].items[${ii}].links.splice(${li},1);_admRenderEditor()">✕</button>
+    </div>`).join('');
+  document.getElementById('adm-editor-body').innerHTML=`
+    <div class="adm-fld">
+      <label>Фото</label>
+      <label class="adm-photo-area${firstPhoto?' has-photo':''}">
+        ${photoHtml}
+        <input type="file" accept="image/*" style="display:none" onchange="admUploadPhoto(this,${ci},${ii})">
+      </label>
+    </div>
+    <div class="adm-fld">
+      <label>Название ✎</label>
+      <input class="adm-inp" id="adm-name-inp" value="${esc(item.name||'')}" placeholder="Что хочешь получить?"
+        oninput="WISHLIST[${ci}].items[${ii}].name=this.value;document.getElementById('adm-editor-title').textContent=this.value||'Новое желание'">
+    </div>
+    <div class="adm-fld">
+      <label>Уточнение / цена ✎</label>
+      <input class="adm-inp" value="${esc(item.sub||'')}" placeholder="Цена, размер, цвет…"
+        oninput="WISHLIST[${ci}].items[${ii}].sub=this.value">
+    </div>
+    <div class="adm-fld">
+      <label>Категория</label>
+      <select class="adm-inp" onchange="admMoveItemToCat(${ci},${ii},+this.value)">${catOpts}</select>
+    </div>
+    <div class="adm-fld">
+      <label>Ссылки</label>
+      ${linksHtml}
+      <button class="adm-inp" style="cursor:pointer;text-align:left;background:var(--sf);color:var(--tx2)"
+        onclick="if(!WISHLIST[${ci}].items[${ii}].links)WISHLIST[${ci}].items[${ii}].links=[];WISHLIST[${ci}].items[${ii}].links.push({label:'',url:''});_admRenderEditor()">+ Добавить ссылку</button>
+    </div>
+    <button class="adm-save-btn" onclick="admSaveItemAndClose()">Сохранить</button>`;
+  document.getElementById('adm-editor-title').textContent=item.name||'Новое желание';
+  document.getElementById('adm-item-screen').classList.add('on');
+  if(!item.name) setTimeout(()=>document.getElementById('adm-name-inp')?.focus(),360);
+}
+
+function admCloseItemEditor(){
+  document.getElementById('adm-item-screen').classList.remove('on');
+  admEditCi=-1; admEditIi=-1;
+}
+
+async function admSaveItemAndClose(){
+  admCloseItemEditor(); renderContent();
+  await admSaveWishlist(); showToast('✓ Сохранено');
+}
+
+function admDeleteItem(){
+  if(admEditCi<0) return;
+  const name=WISHLIST[admEditCi]?.items[admEditIi]?.name||'желание';
+  admShowConfirm({msg:`Удалить «${name}»?`,sub:'Желание пропадёт навсегда',cb:async()=>{
+    WISHLIST[admEditCi].items.splice(admEditIi,1);
+    admCloseItemEditor(); renderContent();
+    await admSaveWishlist(); showToast('Удалено');
+  }});
+}
+
+function admMoveItemToCat(fromCi,ii,toCi){
+  if(fromCi===toCi) return;
+  const item=WISHLIST[fromCi].items.splice(ii,1)[0];
+  if(!WISHLIST[toCi].items) WISHLIST[toCi].items=[];
+  WISHLIST[toCi].items.push(item);
+  admEditCi=toCi; admEditIi=WISHLIST[toCi].items.length-1; _admRenderEditor();
+}
+
+async function admUploadPhoto(input,ci,ii){
+  const file=input.files[0]; if(!file) return; input.value='';
+  showToast('Загружаем фото…');
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const base64=e.target.result.split(',')[1];
+      const r=await fetch('/api/admin/upload',{method:'POST',headers:admHeaders(),body:JSON.stringify({filename:file.name,data:base64})});
+      const d=await r.json(); if(!r.ok) throw new Error(d.error||r.status);
+      if(!WISHLIST[ci].items[ii].media) WISHLIST[ci].items[ii].media=[];
+      WISHLIST[ci].items[ii].media.push(d.url);
+      _admRenderEditor(); showToast('✓ Фото добавлено');
+    }catch(err){showToast('Ошибка: '+err.message);}
+  };
+  reader.readAsDataURL(file);
+}
+
+function admAddCat(){
+  const emojiRow=document.getElementById('adm-inp-emoji-row');
+  const urlInp=document.getElementById('adm-inp-url');
+  const noteInp=document.getElementById('adm-inp-note');
+  emojiRow.style.display='flex'; urlInp.style.display='none'; noteInp.style.display='none';
+  document.getElementById('adm-inp-sheet-title').textContent='Новая категория';
+  document.getElementById('adm-inp-val').placeholder='Название категории';
+  document.getElementById('adm-inp-val').value='';
+  document.getElementById('adm-inp-emoji-val').value='📦';
+  _admInpCb=async(val,emoji)=>{
+    if(!val.trim()) return;
+    WISHLIST.push({id:'cat_'+Date.now(),emoji:emoji||'📦',title:val.trim(),items:[]});
+    renderContent(); await admSaveWishlist(); showToast('✓ Категория добавлена');
+  };
+  document.getElementById('adm-inp-ov').classList.add('on');
+  setTimeout(()=>document.getElementById('adm-inp-val')?.focus(),100);
+}
+
+function admEditPinnedLink(li){
+  const lnk=CFG.pinned_links?.[li]; if(!lnk) return;
+  const emojiRow=document.getElementById('adm-inp-emoji-row');
+  const urlInp=document.getElementById('adm-inp-url');
+  const noteInp=document.getElementById('adm-inp-note');
+  emojiRow.style.display='none'; urlInp.style.display=''; noteInp.style.display='';
+  document.getElementById('adm-inp-sheet-title').textContent='Редактировать ссылку';
+  document.getElementById('adm-inp-val').placeholder='Название';
+  document.getElementById('adm-inp-val').value=lnk.label||'';
+  urlInp.value=lnk.url||'';
+  noteInp.value=lnk.note||'';
+  _admInpCb=async()=>{
+    CFG.pinned_links[li].label=document.getElementById('adm-inp-val').value.trim();
+    CFG.pinned_links[li].url=document.getElementById('adm-inp-url').value.trim();
+    CFG.pinned_links[li].note=document.getElementById('adm-inp-note').value.trim();
+    renderContent(); await admSaveApp(); showToast('✓ Сохранено');
+  };
+  document.getElementById('adm-inp-ov').classList.add('on');
+  setTimeout(()=>document.getElementById('adm-inp-val')?.focus(),100);
+}
+
+function admEditTitle(){
+  const emojiRow=document.getElementById('adm-inp-emoji-row');
+  const urlInp=document.getElementById('adm-inp-url');
+  const noteInp=document.getElementById('adm-inp-note');
+  emojiRow.style.display='none'; urlInp.style.display='none'; noteInp.style.display='none';
+  document.getElementById('adm-inp-sheet-title').textContent='Название вишлиста';
+  document.getElementById('adm-inp-val').placeholder='Мой вишлист';
+  document.getElementById('adm-inp-val').value=CFG.title||'';
+  _admInpCb=async(val)=>{
+    CFG.title=val.trim()||'Вишлист';
+    renderSidebar(); await admSaveApp(); showToast('✓ Название обновлено');
+  };
+  document.getElementById('adm-inp-ov').classList.add('on');
+  setTimeout(()=>document.getElementById('adm-inp-val')?.focus(),100);
+}
+
+let _admInpCb=null;
+function admInpSheetOk(){
+  const val=document.getElementById('adm-inp-val').value;
+  const emoji=document.getElementById('adm-inp-emoji-val').value;
+  document.getElementById('adm-inp-ov').classList.remove('on');
+  if(_admInpCb){_admInpCb(val,emoji);_admInpCb=null;}
+}
+function admInpSheetClose(){
+  document.getElementById('adm-inp-ov').classList.remove('on');
+  _admInpCb=null;
+}
+
+let _admConfCb=null;
+function admShowConfirm({msg,sub='',okLabel='Удалить',cb}){
+  document.getElementById('adm-conf-msg').textContent=msg;
+  document.getElementById('adm-conf-sub').textContent=sub;
+  document.getElementById('adm-conf-ok').textContent=okLabel;
+  _admConfCb=cb;
+  document.getElementById('adm-conf-ov').classList.add('on');
+}
+function admCloseConfirm(confirmed){
+  document.getElementById('adm-conf-ov').classList.remove('on');
+  const cb=_admConfCb;_admConfCb=null;
+  if(confirmed&&cb) cb();
+}
 
 setInterval(refreshBk, 30_000);
 init();
