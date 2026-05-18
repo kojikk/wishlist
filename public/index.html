@@ -435,12 +435,13 @@ function hapticNotif(type='success') { try { tg?.HapticFeedback?.notificationOcc
 let WISHLIST=[], CFG={}, bookings={};
 let activeCat='all', query='', openSecs=new Set();
 let curItem=null, reveal=false;
-let activeView='wishlist'; // 'wishlist' | 'steam' | 'ohmywishes'
-let viewCat={ wishlist:'all', steam:'all', ohmywishes:'all' };
+let activeView='wishlist'; // 'wishlist' | 'steam' | 'ohmywishes' | 'ozon'
+let viewCat={ wishlist:'all', steam:'all', ohmywishes:'all', ozon:'all' };
 
 function mainCats()   { return WISHLIST.filter(c=>!c._external); }
 function steamCats()  { return WISHLIST.filter(c=>c.source==='steam'); }
 function omwCats()    { return WISHLIST.filter(c=>c.source==='ohmywishes'); }
+function ozonCats()   { return WISHLIST.filter(c=>c.source==='ozon'); }
 function uniqueItems(cats){ const seen=new Set(); return cats.flatMap(c=>c.items).filter(i=>{ if(seen.has(i.id))return false; seen.add(i.id); return true; }); }
 
 // ── LIGHTBOX ─────────────────────────────────────────────────────────────────
@@ -546,7 +547,7 @@ async function refreshConfig(){
 function renderSidebar(){
   const nav=document.getElementById('sb-nav');
   if (activeView === 'steam') { nav.innerHTML=''; renderStats(); return; }
-  const cats = activeView==='ohmywishes' ? omwCats() : mainCats();
+  const cats = activeView==='ohmywishes' ? omwCats() : activeView==='ozon' ? ozonCats() : mainCats();
   const all=[{id:'all',emoji:'✦',title:'Все',items:uniqueItems(cats)},...cats];
   nav.innerHTML=all.map(c=>{
     const bc=c.id==='all' ? cats.flatMap(x=>x.items).filter(i=>bookings[i.id]).length : c.items.filter(i=>bookings[i.id]).length;
@@ -563,6 +564,7 @@ function renderSidebar(){
 function renderStats(){
   const cats = activeView==='steam'      ? steamCats()
              : activeView==='ohmywishes' ? omwCats()
+             : activeView==='ozon'       ? ozonCats()
              : mainCats();
   const uniq=uniqueItems(cats);
   const total=uniq.length;
@@ -576,7 +578,7 @@ function renderMobCats(){
   const el=document.getElementById('mob-cats');
   if (activeView === 'steam') { el.style.display='none'; return; }
   el.style.display='';
-  const cats = activeView === 'ohmywishes' ? omwCats() : mainCats();
+  const cats = activeView === 'ohmywishes' ? omwCats() : activeView === 'ozon' ? ozonCats() : mainCats();
   el.innerHTML=[{id:'all',emoji:'✦',title:'Все'},...cats]
     .map(c=>`<div class="cat-chip ${activeCat===c.id?'on':''}" onclick="setCat('${c.id}')">${c.emoji} ${c.title}</div>`)
     .join('');
@@ -588,9 +590,10 @@ function setCat(id){ activeCat=(activeCat===id?'all':id); viewCat[activeView]=ac
 function renderViewTabs() {
   const steamIcon = `<img style="width:15px;height:15px;opacity:.8" src="/media/icons/steam_logo_icon.svg">`;
   const views = [{ id:'wishlist', label:'Вишлист', icon:'✦', count: uniqueItems(mainCats()).length }];
-  const sc=steamCats(), oc=omwCats();
+  const sc=steamCats(), oc=omwCats(), oz=ozonCats();
   if (sc.length) views.push({ id:'steam',      label:'Steam',      icon:steamIcon, count: uniqueItems(sc).length });
   if (oc.length) views.push({ id:'ohmywishes', label:'OhMyWishes', icon:'🎁',      count: uniqueItems(oc).length });
+  if (oz.length) views.push({ id:'ozon',        label:'Ozon',        icon:'🛍️',      count: uniqueItems(oz).length });
 
   if (activeView !== 'wishlist' && !views.find(v => v.id === activeView)) setView('wishlist');
 
@@ -762,9 +765,31 @@ function renderContentList(cats, emptyMsg) {
   attachSwipes();
 }
 
+function renderContentOzon() {
+  const el=document.getElementById('content');
+  const emp=document.getElementById('empty');
+  const q=query.toLowerCase().trim();
+  const cats=ozonCats();
+
+  if(!cats.length){ el.innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--tx3);font-size:14px">🛍️ Ozon не подключён</div>'; emp.style.display='none'; return; }
+
+  const filtered=cats
+    .filter(c=> activeCat==='all' || c.id===activeCat)
+    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q))}))
+    .filter(c=>c.items.length>0);
+
+  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
+  emp.style.display='none';
+
+  filtered.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
+  el.innerHTML=filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
+  attachSwipes();
+}
+
 function renderContent() {
   if (activeView === 'steam')      return renderContentSteam();
   if (activeView === 'ohmywishes') return renderContentOMW();
+  if (activeView === 'ozon')       return renderContentOzon();
   renderContentWishlist();
 }
 
