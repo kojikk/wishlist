@@ -1424,10 +1424,18 @@ let admEditCi=-1, admEditIi=-1;
 function admHeaders(){
   const h={'Content-Type':'application/json'};
   if(adminSession) h['x-tg-session']=adminSession;
+  else{ const t=localStorage.getItem('adminToken'); if(t) h['x-admin-token']=t; }
   return h;
 }
 
 async function initAdminAuth(){
+  // Если есть сохранённый токен от админки — сразу показываем кнопку
+  if(localStorage.getItem('adminToken')){
+    isAdminUser=true;
+    document.getElementById('adm-toggle').classList.add('visible');
+    return;
+  }
+  // Иначе пробуем TG-сессию
   if(!tg?.initData) return;
   try{
     const r=await fetch('/api/auth/tg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData})});
