@@ -68,9 +68,9 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
   background:linear-gradient(to bottom,var(--bg) 70%,transparent);
   pointer-events:none;
 }
-.search-float-inner{max-width:640px;position:relative;pointer-events:all}
+.search-float-inner{max-width:760px;position:relative;pointer-events:all;display:flex;align-items:center;gap:8px}
 .search-input{
-  width:100%;background:var(--sf);
+  flex:1;min-width:0;background:var(--sf);
   border:1px solid var(--br2);border-radius:99px;
   padding:10px 16px 10px 38px;
   font-family:'Onest',sans-serif;font-size:14px;color:var(--tx);
@@ -79,6 +79,47 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .search-input::placeholder{color:var(--tx3)}
 .search-input:focus{border-color:rgba(255,255,255,.2);box-shadow:0 0 0 3px rgba(232,200,74,.07)}
 .search-ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:.25;pointer-events:none}
+
+/* ═══ FILTER BUTTON & PANEL ═══ */
+.filter-wrap{position:relative;flex-shrink:0}
+.filter-btn{display:flex;align-items:center;gap:6px;background:var(--sf);border:1px solid var(--br2);border-radius:99px;padding:9px 14px;color:var(--tx2);font-size:13px;font-weight:500;cursor:pointer;transition:.15s;white-space:nowrap;font-family:'Onest',sans-serif}
+.filter-btn:hover{border-color:var(--br3);color:var(--tx)}
+.filter-btn.active{border-color:var(--ac);color:var(--ac);background:var(--adim)}
+.filter-badge{display:none;background:var(--ac);color:#111;border-radius:99px;padding:0 5px;font-size:10px;font-weight:700;min-width:16px;text-align:center}
+.filter-btn.active .filter-badge{display:inline-block}
+/* Filter panel */
+.filter-panel{position:absolute;top:calc(100% + 8px);right:0;width:260px;background:var(--sf2);border:1px solid var(--br2);border-radius:14px;padding:16px;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .18s,transform .18s;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.45)}
+.filter-panel.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.fpanel-label{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.fpanel-sep{border:none;border-top:1px solid var(--br);margin:12px 0}
+.fpanel-layout{display:flex;gap:5px;margin-bottom:0}
+.flay-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:8px;border:1px solid var(--br2);background:none;color:var(--tx3);font-size:12px;font-weight:500;cursor:pointer;transition:.15s;font-family:'Onest',sans-serif}
+.flay-btn.on{background:var(--sf3);border-color:var(--br3);color:var(--tx)}
+.flay-btn:hover:not(.on){color:var(--tx2);border-color:var(--br3)}
+.fpanel-price{display:flex;align-items:center;gap:8px;margin-top:0}
+.fprice-row{flex:1;position:relative}
+.fprice-inp{width:100%;background:var(--sf3);border:1px solid var(--br2);border-radius:8px;padding:7px 26px 7px 10px;font-family:'Onest',sans-serif;font-size:13px;color:var(--tx);outline:none;transition:border-color .2s;-moz-appearance:textfield}
+.fprice-inp::-webkit-outer-spin-button,.fprice-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.fprice-inp:focus{border-color:rgba(255,255,255,.25)}
+.fprice-unit{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--tx3);pointer-events:none}
+.fprice-dash{color:var(--tx3);font-size:13px;flex-shrink:0}
+.fpanel-reset{width:100%;margin-top:12px;padding:7px;border-radius:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgba(248,113,113,.8);font-size:12px;font-weight:500;cursor:pointer;font-family:'Onest',sans-serif;transition:.15s;display:none}
+.fpanel-reset:hover{background:rgba(248,113,113,.15)}
+.fpanel-reset.show{display:block}
+/* Item grid (for all views in grid mode) */
+.item-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:900px){.item-grid{grid-template-columns:repeat(3,1fr)}}
+/* Mobile filter button row */
+.mob-search-row{display:flex;gap:8px;align-items:center}
+.mob-search-row .mob-search{flex:1;min-width:0}
+.mob-filter-btn{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:38px;height:38px;background:var(--sf);border:1px solid var(--br);border-radius:99px;color:var(--tx2);cursor:pointer;transition:.15s;position:relative}
+.mob-filter-btn:hover{border-color:var(--br2);color:var(--tx)}
+.mob-filter-btn.active{border-color:var(--ac);color:var(--ac);background:var(--adim)}
+.mob-filter-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--ac);display:none}
+.mob-filter-btn.active .mob-filter-dot{display:block}
+.mob-filter-btn .filter-panel{top:calc(100% + 8px);right:0}
+/* ozon list mode (no max-height cap) */
+.ozon-list{display:flex;flex-direction:column;gap:5px}
 
 /* ═══ MOBILE HEADER ═══ */
 .mob-hdr{
@@ -174,7 +215,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .sec-arr.op{transform:rotate(90deg)}
 
 .items-list{display:flex;flex-direction:column;gap:5px;overflow:hidden;max-height:0;transition:max-height .38s cubic-bezier(.4,0,.2,1)}
-.items-list.op{max-height:6000px}
+.items-list.op{overflow:hidden}
 
 /* cat media inside items-list */
 .cat-media{display:flex;gap:6px;margin-bottom:8px;overflow-x:auto;scrollbar-width:none}
@@ -289,6 +330,28 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 @keyframes bookPop{0%{transform:scale(1)}40%{transform:scale(1.03)}70%{transform:scale(.985)}100%{transform:scale(1)}}
 .item-card.pop{animation:bookPop .35s ease}
 
+/* ═══ OZON PRODUCT GRID ═══ */
+.ozon-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:900px){.ozon-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1200px){.ozon-grid{grid-template-columns:repeat(4,1fr)}}
+.ozon-card{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:background .15s,border-color .15s,transform .12s;animation:cardIn .25s ease both;display:flex;flex-direction:column}
+.ozon-card:hover{background:var(--sf2);border-color:var(--br2)}
+.ozon-card:active{transform:scale(.99)}
+.ozon-card.booked{background:var(--gdim);border-color:var(--gbr)}
+.ozon-card.mine{background:var(--adim);border-color:var(--abr)}
+.ozon-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:var(--sf2);position:relative;flex-shrink:0}
+.ozon-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .22s}
+.ozon-card:hover .ozon-img{transform:scale(1.05)}
+.ozon-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--tx3)}
+.ozon-body{padding:8px 10px 10px;display:flex;flex-direction:column;flex:1;gap:3px}
+.ozon-name{font-size:12px;font-weight:500;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ozon-price{font-size:13px;font-weight:700;color:var(--ac);margin-top:auto;padding-top:4px}
+.ozon-status{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500;align-self:flex-start;margin-top:2px}
+.ozon-status.booked{background:var(--gdim);color:var(--gn);border:1px solid var(--gbr)}
+.ozon-status.mine{background:var(--adim);color:var(--ac);border:1px solid var(--abr)}
+.ozon-buy-pill{display:inline-flex;align-items:center;gap:4px;margin-top:6px;align-self:flex-start;padding:4px 11px;border-radius:99px;background:rgba(0,100,255,.08);color:rgba(120,175,255,.75);font-size:11px;font-weight:500;text-decoration:none;border:1px solid rgba(0,100,255,.18);transition:background .15s,color .15s,border-color .15s}
+.ozon-buy-pill:hover{background:rgba(0,100,255,.15);color:#a0c8ff;border-color:rgba(0,100,255,.3)}
+
 /* ═══ LIGHTBOX ═══ */
 .lb{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(8px)}
 .lb.on{opacity:1;pointer-events:all}
@@ -380,9 +443,44 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
     </div>
     <div class="view-tabs mob-view-tabs" id="mob-view-tabs"></div>
     <div class="mob-pills" id="mob-pills"><span class="sb-pill">…</span></div>
-    <div class="mob-search">
-      <svg class="search-ic" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="white" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-      <input type="text" placeholder="Поиск…" id="mob-search-inp" autocomplete="off">
+    <div class="mob-search-row">
+      <div class="mob-search">
+        <svg class="search-ic" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="white" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="Поиск…" id="mob-search-inp" autocomplete="off">
+      </div>
+      <div class="filter-wrap" id="mob-filter-wrap">
+        <button class="mob-filter-btn" id="mob-filter-btn" onclick="toggleFilter(event,'mob')">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div class="mob-filter-dot"></div>
+        </button>
+        <div class="filter-panel" id="mob-filter-panel">
+          <div class="fpanel-label">Отображение</div>
+          <div class="fpanel-layout">
+            <button class="flay-btn" data-layout="list" onclick="setLayout('list')">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0" y="1" width="12" height="2" rx="1" fill="currentColor"/><rect x="0" y="5" width="12" height="2" rx="1" fill="currentColor"/><rect x="0" y="9" width="12" height="2" rx="1" fill="currentColor"/></svg>
+              Список
+            </button>
+            <button class="flay-btn" data-layout="grid" onclick="setLayout('grid')">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0" y="0" width="5" height="5" rx="1" fill="currentColor"/><rect x="7" y="0" width="5" height="5" rx="1" fill="currentColor"/><rect x="0" y="7" width="5" height="5" rx="1" fill="currentColor"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor"/></svg>
+              Плитка
+            </button>
+          </div>
+          <div class="fpanel-sep"></div>
+          <div class="fpanel-label">Цена</div>
+          <div class="fpanel-price">
+            <div class="fprice-row">
+              <input class="fprice-inp fp-min" type="number" placeholder="От" min="0" oninput="onPriceInput(this)">
+              <span class="fprice-unit">₽</span>
+            </div>
+            <span class="fprice-dash">—</span>
+            <div class="fprice-row">
+              <input class="fprice-inp fp-max" type="number" placeholder="До" min="0" oninput="onPriceInput(this)">
+              <span class="fprice-unit">₽</span>
+            </div>
+          </div>
+          <button class="fpanel-reset" onclick="resetFilters()">Сбросить фильтры</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="mob-cats" id="mob-cats"></div>
@@ -391,6 +489,40 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
     <div class="search-float-inner">
       <svg class="search-ic" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="white" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
       <input class="search-input" type="text" placeholder="Поиск по вишлисту…" id="desk-search-inp" autocomplete="off">
+      <div class="filter-wrap" id="filter-wrap">
+        <button class="filter-btn" id="filter-btn" onclick="toggleFilter(event,'desk')">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Фильтры
+          <span class="filter-badge" id="filter-badge">0</span>
+        </button>
+        <div class="filter-panel" id="filter-panel">
+          <div class="fpanel-label">Отображение</div>
+          <div class="fpanel-layout">
+            <button class="flay-btn" data-layout="list" onclick="setLayout('list')">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0" y="1" width="12" height="2" rx="1" fill="currentColor"/><rect x="0" y="5" width="12" height="2" rx="1" fill="currentColor"/><rect x="0" y="9" width="12" height="2" rx="1" fill="currentColor"/></svg>
+              Список
+            </button>
+            <button class="flay-btn" data-layout="grid" onclick="setLayout('grid')">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0" y="0" width="5" height="5" rx="1" fill="currentColor"/><rect x="7" y="0" width="5" height="5" rx="1" fill="currentColor"/><rect x="0" y="7" width="5" height="5" rx="1" fill="currentColor"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor"/></svg>
+              Плитка
+            </button>
+          </div>
+          <div class="fpanel-sep"></div>
+          <div class="fpanel-label">Цена</div>
+          <div class="fpanel-price">
+            <div class="fprice-row">
+              <input class="fprice-inp fp-min" type="number" placeholder="От" min="0" oninput="onPriceInput(this)">
+              <span class="fprice-unit">₽</span>
+            </div>
+            <span class="fprice-dash">—</span>
+            <div class="fprice-row">
+              <input class="fprice-inp fp-max" type="number" placeholder="До" min="0" oninput="onPriceInput(this)">
+              <span class="fprice-unit">₽</span>
+            </div>
+          </div>
+          <button class="fpanel-reset" onclick="resetFilters()">Сбросить фильтры</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="content" id="content">
@@ -437,6 +569,9 @@ let activeCat='all', query='', openSecs=new Set();
 let curItem=null, reveal=false;
 let activeView='wishlist'; // 'wishlist' | 'steam' | 'ohmywishes' | 'ozon'
 let viewCat={ wishlist:'all', steam:'all', ohmywishes:'all', ozon:'all' };
+let viewLayout='list';   // 'list' | 'grid'
+let filterPriceMin=0;
+let filterPriceMax=0;
 
 function mainCats()   { return WISHLIST.filter(c=>!c._external); }
 function steamCats()  { return WISHLIST.filter(c=>c.source==='steam'); }
@@ -466,7 +601,6 @@ function lbOpenThumb(box){
 function fitThumb(img){
   const r=img.naturalWidth/img.naturalHeight;
   const mob=window.innerWidth<=720;
-  // [w, h] presets based on aspect ratio
   let w,h;
   if      (r<0.6)   {w=58; h=100;}
   else if (r<0.85)  {w=66; h=88;}
@@ -510,6 +644,7 @@ async function init(){
     bookings=br.ok ? await br.json() : {};
     openSecs=new Set(mainCats().map(c=>c.id));
     renderViewTabs(); renderSidebar(); renderMobCats(); renderStats(); renderContent();
+    updateFilterUI();
   } catch(e) {
     console.error(e);
     document.getElementById('content').innerHTML=`<div style="padding:24px;color:var(--tx2);font-size:13px;line-height:1.6">
@@ -526,7 +661,6 @@ async function refreshConfig(){
     const cfg = await cr.json();
     WISHLIST=cfg.wishlist||[]; CFG=cfg.app||{};
     bookings=br.ok ? await br.json() : bookings;
-    // preserve open sections for new categories
     mainCats().forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
     renderViewTabs(); renderSidebar(); renderMobCats(); renderStats();
     if(!document.getElementById('ov').classList.contains('on')) renderContent();
@@ -606,6 +740,120 @@ function renderViewTabs() {
   ['view-tabs','mob-view-tabs'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=html; });
 }
 
+// ── FILTER ───────────────────────────────────────────────────────────────────
+function tryParsePrice(sub) {
+  if (!sub) return null;
+  const cleaned = sub.replace(/\s/g, '').replace(/[^\d]/g, '');
+  if (!cleaned) return null;
+  const n = parseInt(cleaned, 10);
+  return isNaN(n) ? null : n;
+}
+
+function filterItems(items) {
+  return items.filter(item => {
+    const price = tryParsePrice(item.sub);
+    if (price === null) return true; // unparseable price — always show
+    if (filterPriceMin > 0 && price < filterPriceMin) return false;
+    if (filterPriceMax > 0 && price > filterPriceMax) return false;
+    return true;
+  });
+}
+
+function toggleFilter(event, which) {
+  event.stopPropagation();
+  const panelId = which === 'mob' ? 'mob-filter-panel' : 'filter-panel';
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const isOpen = panel.classList.contains('open');
+  // close all panels first
+  document.querySelectorAll('.filter-panel').forEach(p => p.classList.remove('open'));
+  // open this one if it was closed
+  if (!isOpen) panel.classList.add('open');
+}
+
+// close filter panels on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.filter-wrap') && !e.target.closest('.mob-filter-btn')) {
+    document.querySelectorAll('.filter-panel').forEach(p => p.classList.remove('open'));
+  }
+});
+
+function setLayout(mode) {
+  if (viewLayout === mode) return;
+  viewLayout = mode;
+  updateFilterUI();
+  renderContent();
+  haptic('light');
+}
+
+function onPriceInput(el) {
+  const val = parseInt(el.value) || 0;
+  if (el.classList.contains('fp-min')) {
+    filterPriceMin = val;
+    document.querySelectorAll('.fp-min').forEach(inp => {
+      if (inp !== el && document.activeElement !== inp) inp.value = val || '';
+    });
+  } else {
+    filterPriceMax = val;
+    document.querySelectorAll('.fp-max').forEach(inp => {
+      if (inp !== el && document.activeElement !== inp) inp.value = val || '';
+    });
+  }
+  updateFilterUI();
+  renderContent();
+}
+
+function resetFilters() {
+  viewLayout = 'list';
+  filterPriceMin = 0;
+  filterPriceMax = 0;
+  document.querySelectorAll('.fp-min').forEach(inp => { inp.value = ''; });
+  document.querySelectorAll('.fp-max').forEach(inp => { inp.value = ''; });
+  updateFilterUI();
+  renderContent();
+  haptic('light');
+}
+
+function updateFilterUI() {
+  const hasFilter = viewLayout !== 'list' || filterPriceMin > 0 || filterPriceMax > 0;
+  const count = (viewLayout !== 'list' ? 1 : 0) + (filterPriceMin > 0 || filterPriceMax > 0 ? 1 : 0);
+
+  // sync desktop filter button
+  const fb = document.getElementById('filter-btn');
+  if (fb) fb.classList.toggle('active', hasFilter);
+
+  // sync mobile filter button
+  const mfb = document.getElementById('mob-filter-btn');
+  if (mfb) mfb.classList.toggle('active', hasFilter);
+
+  // badge
+  const badge = document.getElementById('filter-badge');
+  if (badge) badge.textContent = count > 0 ? String(count) : '';
+
+  // sync layout buttons (all flay-btn elements with data-layout)
+  document.querySelectorAll('[data-layout]').forEach(btn => {
+    btn.classList.toggle('on', btn.dataset.layout === viewLayout);
+  });
+
+  // sync price inputs (only those not focused)
+  document.querySelectorAll('.fp-min').forEach(inp => {
+    if (document.activeElement !== inp) inp.value = filterPriceMin || '';
+  });
+  document.querySelectorAll('.fp-max').forEach(inp => {
+    if (document.activeElement !== inp) inp.value = filterPriceMax || '';
+  });
+
+  // reset button visibility
+  document.querySelectorAll('.fpanel-reset').forEach(el => el.classList.toggle('show', hasFilter));
+}
+
+// ── AFTER RENDER ─────────────────────────────────────────────────────────────
+function afterRender() {
+  document.querySelectorAll('.items-list.op').forEach(list => {
+    list.style.maxHeight = list.scrollHeight + 'px';
+  });
+}
+
 function setView(id) {
   if (activeView === id) return;
   activeView = id;
@@ -641,6 +889,37 @@ function renderPinnedLink(link, delay){
 }
 
 // ── CONTENT ───────────────────────────────────────────────────────────────────
+function renderGridCard(item, delay) {
+  const bk = bookings[item.id];
+  const mine = bk && String(bk.id) === String(tgUser.id);
+  const cls = bk ? (mine ? 'mine' : 'booked') : '';
+  const allImgs = [
+    ...(item.imageUrl ? [item.imageUrl] : []),
+    ...(item.media || []).map(m => m.startsWith('http') ? m : '/media/' + m),
+  ];
+  const links = item.links || [];
+  const buyLink = links[0];
+  const statusHtml = mine
+    ? `<span class="ozon-status mine">мой подарок ✦</span>`
+    : bk ? `<span class="ozon-status booked">забронировано</span>` : '';
+  const buyBtn = buyLink ? `<a class="ozon-buy-pill" href="${buyLink.url}" target="_blank" onclick="event.stopPropagation()">
+    <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    ${buyLink.label || 'Открыть'}</a>` : '';
+  return `<div class="ozon-card ${cls}" id="ic-${item.id}" data-id="${item.id}" onclick="openModal('${item.id}')" style="animation-delay:${Math.min(delay*12,400)}ms">
+    <div class="ozon-img-wrap">
+      ${allImgs.length
+        ? `<img class="ozon-img" src="${allImgs[0]}" loading="lazy" alt="">`
+        : `<div class="ozon-img-placeholder">${item.emoji || '✦'}</div>`}
+    </div>
+    <div class="ozon-body">
+      <div class="ozon-name">${item.name}</div>
+      ${item.sub ? `<div class="ozon-price">${item.sub}</div>` : ''}
+      ${statusHtml}
+      ${buyBtn}
+    </div>
+  </div>`;
+}
+
 function renderSection(cat, ci) {
   const isOpen=openSecs.has(cat.id);
   const bc=cat.items.filter(i=>bookings[i.id]).length;
@@ -651,6 +930,18 @@ function renderSection(cat, ci) {
           onclick="lbOpen(${JSON.stringify(catMedia.map(x=>'/media/'+x))},${mi})" alt="">`
       ).join('')}</div>`
     :'';
+
+  let itemsHtml;
+  if (viewLayout === 'grid') {
+    itemsHtml = `<div class="item-grid">${cat.items.map((item,ii)=>renderGridCard(item,ii)).join('')}</div>`;
+  } else {
+    itemsHtml = cat.items.map((item,ii)=>renderItem(item,ii)).join('');
+  }
+
+  const estHeight = isOpen
+    ? (viewLayout === 'grid' ? Math.ceil(cat.items.length / 2) * 200 : cat.items.length * 95) + 'px'
+    : '0';
+
   return `<div class="section" style="animation-delay:${ci*48}ms" id="sec-${cat.id}">
     <div class="sec-head" onclick="toggleSec('${cat.id}')">
       <div class="sec-emoji">${cat.emoji}</div>
@@ -661,9 +952,9 @@ function renderSection(cat, ci) {
       </div>
       <div class="sec-arr ${isOpen?'op':''}" id="arr-${cat.id}">▶</div>
     </div>
-    <div class="items-list ${isOpen?'op':''}" id="il-${cat.id}">
+    <div class="items-list ${isOpen?'op':''}" id="il-${cat.id}" style="max-height:${estHeight}">
       ${catMediaHtml}
-      ${cat.items.map((item,ii)=>renderItem(item,ii)).join('')}
+      ${itemsHtml}
     </div>
   </div>`;
 }
@@ -675,10 +966,10 @@ function renderContentWishlist() {
 
   const filtered=mainCats()
     .filter(c=> activeCat==='all' || c.id===activeCat)
-    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q))}))
+    .map(c=>({...c,items:filterItems(c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q)))}))
     .filter(c=>c.items.length>0);
 
-  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
+  if(!filtered.length&&(q||filterPriceMin||filterPriceMax)){ el.innerHTML=''; emp.style.display='block'; return; }
   emp.style.display='none';
 
   let topHtml='';
@@ -702,6 +993,7 @@ function renderContentWishlist() {
 
   el.innerHTML=topHtml+filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
   attachSwipes();
+  afterRender();
 }
 
 function renderContentSteam() {
@@ -713,15 +1005,16 @@ function renderContentSteam() {
   if(!cats.length){ el.innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--tx3);font-size:14px">🎮 Steam не подключён</div>'; emp.style.display='none'; return; }
 
   const filtered=cats
-    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.tags||[]).some(t=>t.toLowerCase().includes(q)))}))
+    .map(c=>({...c,items:filterItems(c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.tags||[]).some(t=>t.toLowerCase().includes(q))))}))
     .filter(c=>c.items.length>0);
 
-  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
+  if(!filtered.length&&(q||filterPriceMin||filterPriceMax)){ el.innerHTML=''; emp.style.display='block'; return; }
   emp.style.display='none';
 
   filtered.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
   el.innerHTML=filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
   attachSwipes();
+  afterRender();
 }
 
 function renderContentOMW() {
@@ -734,35 +1027,42 @@ function renderContentOMW() {
 
   const filtered=cats
     .filter(c=> activeCat==='all' || c.id===activeCat)
-    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q))}))
+    .map(c=>({...c,items:filterItems(c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q)))}))
     .filter(c=>c.items.length>0);
 
-  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
+  if(!filtered.length&&(q||filterPriceMin||filterPriceMax)){ el.innerHTML=''; emp.style.display='block'; return; }
   emp.style.display='none';
 
   filtered.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
   el.innerHTML=filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
   attachSwipes();
+  afterRender();
 }
 
-function renderContentList(cats, emptyMsg) {
-  const el=document.getElementById('content');
-  const emp=document.getElementById('empty');
-  const q=query.toLowerCase().trim();
-
-  if(!cats.length){ el.innerHTML=`<div style="padding:60px 20px;text-align:center;color:var(--tx3);font-size:14px">${emptyMsg}</div>`; emp.style.display='none'; return; }
-
-  const filtered=cats
-    .filter(c=> activeCat==='all' || c.id===activeCat)
-    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q))}))
-    .filter(c=>c.items.length>0);
-
-  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
-  emp.style.display='none';
-
-  filtered.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
-  el.innerHTML=filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
-  attachSwipes();
+function renderOzonCard(item, delay) {
+  const bk=bookings[item.id];
+  const mine=bk&&String(bk.id)===String(tgUser.id);
+  const cls=bk?(mine?'mine':'booked'):'';
+  const link=(item.links||[])[0];
+  const statusHtml=mine
+    ?`<span class="ozon-status mine">мой подарок ✦</span>`
+    :bk?`<span class="ozon-status booked">забронировано</span>`:'';
+  const buyBtn=link?`<a class="ozon-buy-pill" href="${link.url}" target="_blank" onclick="event.stopPropagation()">
+    <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Купить на Ozon</a>`:'';
+  return `<div class="ozon-card ${cls}" id="ic-${item.id}" data-id="${item.id}" onclick="openModal('${item.id}')" style="animation-delay:${Math.min(delay*15,400)}ms">
+    <div class="ozon-img-wrap">
+      ${item.imageUrl
+        ?`<img class="ozon-img" src="${item.imageUrl}" loading="lazy" alt="">`
+        :`<div class="ozon-img-placeholder">🛍️</div>`}
+    </div>
+    <div class="ozon-body">
+      <div class="ozon-name">${item.name}</div>
+      ${item.sub?`<div class="ozon-price">${item.sub}</div>`:''}
+      ${statusHtml}
+      ${buyBtn}
+    </div>
+  </div>`;
 }
 
 function renderContentOzon() {
@@ -773,17 +1073,18 @@ function renderContentOzon() {
 
   if(!cats.length){ el.innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--tx3);font-size:14px">🛍️ Ozon не подключён</div>'; emp.style.display='none'; return; }
 
-  const filtered=cats
-    .filter(c=> activeCat==='all' || c.id===activeCat)
-    .map(c=>({...c,items:c.items.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q))}))
-    .filter(c=>c.items.length>0);
+  let items=filterItems(cats.flatMap(c=>c.items)
+    .filter(i=>!q||i.name.toLowerCase().includes(q)||(i.sub||'').toLowerCase().includes(q)));
 
-  if(!filtered.length&&q){ el.innerHTML=''; emp.style.display='block'; return; }
+  if(!items.length){ el.innerHTML=''; emp.style.display='block'; return; }
   emp.style.display='none';
 
-  filtered.forEach(c=>{ if(!openSecs.has(c.id)) openSecs.add(c.id); });
-  el.innerHTML=filtered.map((cat,ci)=>renderSection(cat,ci)).join('');
-  attachSwipes();
+  if(viewLayout==='list'){
+    el.innerHTML=`<div class="ozon-list">${items.map((item,i)=>renderItem(item,i)).join('')}</div>`;
+    attachSwipes();
+  } else {
+    el.innerHTML=`<div class="ozon-grid">${items.map((item,i)=>renderOzonCard(item,i)).join('')}</div>`;
+  }
 }
 
 function renderContent() {
@@ -804,14 +1105,12 @@ function renderItem(item,delay){
       :`<div class="item-booker">Уже забронировано ✦</div>`;
   }
 
-  // Combine imageUrl + local media into one array
   const allImgs=[
     ...(item.imageUrl?[item.imageUrl]:[]),
     ...(item.media||[]).map(m=>m.startsWith('http')?m:'/media/'+m),
   ];
   const imgsJson=allImgs.length?JSON.stringify(allImgs):'[]';
 
-  // Side thumbnail box (right-aligned)
   const thumbHtml=allImgs.length?`<div class="item-thumb-box" id="tb-${item.id}"
     data-imgs='${imgsJson}' data-idx="0"
     onclick="lbOpenThumb(this);event.stopPropagation()">
@@ -824,16 +1123,13 @@ function renderItem(item,delay){
       <div class="item-thumb-cnt">1/${allImgs.length}</div>`:''}
   </div>`:'';
 
-  // Tags (genres for Steam etc.)
   const tags=item.tags||[];
   const links=item.links||[];
   const steamLink=links.find(l=>l.style==='steam');
   const otherLinks=links.filter(l=>l.style!=='steam');
 
-  // Tags always shown as itag bubbles
   const tagsHtml=tags.length?`<div class="item-tags">${tags.map(t=>`<span class="itag">${t}</span>`).join('')}</div>`:'';
 
-  // Regular links (non-steam)
   const linksHtml=otherLinks.length?`<div class="item-links">${otherLinks.slice(0,3).map(l=>`<a class="ilink" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
     <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
     ${l.label}</a>`).join('')}</div>`:'';
@@ -902,9 +1198,25 @@ function attachSwipes(){
 
 // ── SECTION TOGGLE ────────────────────────────────────────────────────────────
 function toggleSec(id){
-  openSecs.has(id)?openSecs.delete(id):openSecs.add(id);
-  document.getElementById('il-'+id)?.classList.toggle('op',openSecs.has(id));
-  document.getElementById('arr-'+id)?.classList.toggle('op',openSecs.has(id));
+  const wasOpen = openSecs.has(id);
+  if (wasOpen) { openSecs.delete(id); } else { openSecs.add(id); }
+  const list = document.getElementById('il-'+id);
+  const arr = document.getElementById('arr-'+id);
+  if (list) {
+    if (!wasOpen) {
+      // opening
+      list.classList.add('op');
+      list.style.maxHeight = list.scrollHeight + 'px';
+    } else {
+      // closing: set explicit height first, then animate to 0
+      list.style.maxHeight = list.scrollHeight + 'px';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        list.style.maxHeight = '0';
+        list.classList.remove('op');
+      }));
+    }
+  }
+  if (arr) arr.classList.toggle('op', !wasOpen);
   haptic();
 }
 

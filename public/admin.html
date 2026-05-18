@@ -8,7 +8,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Onest:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/theme.css">
 <style>
-:root{ --r:10px; }
+:root{
+  --r: 10px;
+  /* Warm palette override (admin-only) */
+  --bg:  #0e0d0b;
+  --sf:  #17150f;
+  --sf2: #1e1c14;
+  --sf3: #252219;
+  --br:  rgba(255,235,150,0.07);
+  --br2: rgba(255,235,150,0.13);
+  --br3: rgba(255,235,150,0.22);
+  --tx2: rgba(240,230,200,0.60);
+  --tx3: rgba(240,230,200,0.28);
+}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
 
@@ -57,11 +69,13 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .panel-main{flex:1;min-width:0;overflow-y:auto;padding:20px 24px}
 
 /* CATEGORY BLOCK */
-.cat-block{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);margin-bottom:10px;transition:border-color .15s,opacity .15s}
+.cat-block{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);margin-bottom:10px;transition:border-color .15s,opacity .15s,box-shadow .15s}
 .cat-block.dragging{opacity:.4}
 .cat-block.drag-over{border-color:var(--ac);background:var(--adim)}
+.cat-block.expanded{border-color:rgba(255,235,150,0.18);box-shadow:0 0 0 1px rgba(255,235,150,0.06) inset}
 .cat-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;transition:background .14s}
 .cat-header:hover{background:var(--sf2)}
+.cat-block.expanded>.cat-header{background:var(--sf2)}
 .cat-drag-handle{cursor:grab;color:var(--tx3);font-size:15px;line-height:1;padding:2px 2px;flex-shrink:0;transition:color .13s}
 .cat-drag-handle:hover{color:var(--tx2)}
 .cat-drag-handle:active{cursor:grabbing}
@@ -184,6 +198,121 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 .panel-empty{padding:60px 24px;text-align:center;color:var(--tx3)}
 .sect-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .sect-hdr h2{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:600;color:var(--tx2)}
+
+/* ═══ MOBILE ≤720px ═══ */
+@media(max-width:720px){
+  #app{height:100dvh}
+  .body{flex-direction:column;overflow:visible}
+  .panel-nav{display:none!important}
+  .panel-main{flex:1;overflow-y:auto;padding:12px 14px 82px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+
+  /* Topbar — logo + save only */
+  .topbar{padding:0 14px;height:54px}
+  .save-status{display:none}
+  .topbar-right .tbtn:not(.primary){display:none}
+  .tbtn.primary{padding:9px 18px;font-size:13px}
+
+  /* Category */
+  .cat-block{border-radius:14px;margin-bottom:12px}
+  .cat-header{min-height:60px;padding:8px 8px 8px 14px;gap:2px;-webkit-tap-highlight-color:transparent}
+  .cat-drag-handle,.cat-move,.cat-sub-inp{display:none!important}
+  .cat-emoji-inp{width:44px;height:44px;font-size:26px;text-align:center;border:none;background:transparent;padding:0;cursor:pointer;flex-shrink:0;line-height:44px}
+  .cat-title-inp{flex:1;min-width:0;border:none;background:transparent;font-size:15px;font-weight:600;color:var(--tx);padding:0 10px;font-family:'Unbounded',sans-serif;letter-spacing:-.2px}
+  .cat-toggle{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+  .cat-del{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:19px;padding:0;flex-shrink:0}
+  .cat-body{padding:0 0 8px}
+
+  /* Items */
+  .item-row{min-height:58px;padding:0 14px;border:none;border-bottom:1px solid var(--br);border-radius:0;margin-bottom:0;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .item-row:active{background:rgba(255,255,255,.05)}
+  .item-move,.item-del{display:none!important}
+  .item-name-inp,.item-sub-inp,.item-links-area,.item-media-area,.add-link-btn,.item-row-top{display:none!important}
+  .mob-item-display{display:flex!important;flex-direction:column;justify-content:center;gap:3px;flex:1;min-width:0}
+  .mob-item-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+  .mob-item-sub{font-size:12px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+  .mob-item-arr{width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--ac);font-size:14px;opacity:.4;flex-shrink:0}
+  .cat-edit-hint{font-size:13px;color:var(--tx3);opacity:.4;pointer-events:none;flex-shrink:0;margin-left:-4px}
+  .add-item-btn{width:calc(100% - 28px);margin:10px 14px 4px;padding:15px;font-size:14px;border-radius:12px;min-height:52px}
+  .add-cat-btn{padding:15px;font-size:14px;min-height:52px;border-radius:14px;margin-top:8px}
+
+  /* Settings */
+  .pl-row-top{flex-wrap:wrap}
+  .pl-row-bottom{flex-direction:column}
+  .parser-row{flex-wrap:wrap;gap:10px}
+  .parser-cookies-ta{min-height:100px}
+  .bk-table{font-size:12px}
+  .bk-table th,.bk-table td{padding:8px}
+  .bk-table th:nth-child(3),.bk-table td:nth-child(3){display:none}
+
+  .mob-tabs{display:flex!important}
+}
+@media(min-width:721px){
+  .mob-tabs,.mob-fab,.mob-item-screen{display:none!important}
+  .mob-item-display,.mob-item-arr{display:none!important}
+  .cat-edit-hint{display:none!important}
+}
+
+/* Bottom tabs */
+.mob-tabs{display:none;position:fixed;bottom:0;left:0;right:0;height:58px;background:var(--sf);border-top:1px solid var(--br);z-index:200}
+.mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;font-weight:500;color:var(--tx3);cursor:pointer;transition:color .15s;border:none;background:none;font-family:'Onest',sans-serif;padding:6px 0;-webkit-tap-highlight-color:transparent}
+.mob-tab.on{color:var(--ac);box-shadow:inset 0 2px 0 var(--ac)}
+.mob-tab-ic{font-size:22px;line-height:1}
+
+/* FAB */
+.mob-fab{display:none;position:fixed;bottom:70px;right:16px;width:56px;height:56px;border-radius:50%;background:var(--ac);border:none;color:#0f0f0f;font-size:30px;line-height:1;align-items:center;justify-content:center;cursor:pointer;z-index:201;box-shadow:0 4px 24px rgba(0,0,0,.5);transition:transform .15s;font-family:'Onest',sans-serif;font-weight:300}
+.mob-fab:active{transform:scale(.88)}
+
+/* Overlay */
+.mob-sheet-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:210;opacity:0;pointer-events:none;transition:opacity .28s}
+.mob-sheet-ov.on{opacity:1;pointer-events:all}
+
+/* Full-screen item editor — mobile only */
+.mob-item-screen{position:fixed;inset:0;background:var(--bg);z-index:220;display:flex;flex-direction:column;transform:translateX(100%);pointer-events:none;transition:transform .3s cubic-bezier(.32,0,.67,0);padding-bottom:env(safe-area-inset-bottom,0)}
+.mob-item-screen.open{transform:translateX(0);pointer-events:all;transition-timing-function:cubic-bezier(.33,1,.68,1)}
+.mis-hdr{display:flex;align-items:center;gap:12px;padding:0 14px;height:54px;background:var(--sf);border-bottom:1px solid var(--br);flex-shrink:0}
+.mis-back{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:none;background:var(--sf2);color:var(--tx2);font-size:22px;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;line-height:1;font-family:system-ui,sans-serif}
+.mis-title-span{flex:1;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.mis-del-btn{border:none;background:var(--rdim);color:var(--red);border-radius:10px;padding:0 14px;height:36px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Onest',sans-serif;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.mis-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:40px}
+.mis-photo-area{width:100%;height:130px;background:var(--sf2);border:1.5px dashed var(--br2);border-radius:16px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;cursor:pointer;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;transition:border-color .15s}
+.mis-photo-area:active{background:var(--sf3)}
+.mis-photo-area.has-photo{border-style:solid;border-color:var(--br)}
+.mis-photo-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mis-photo-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
+.mis-photo-placeholder{font-size:28px;opacity:.45}
+.mis-photo-label{font-size:13px;color:rgba(255,255,255,.6);font-weight:500}
+
+/* Confirm modal */
+.mod-ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;display:flex;align-items:flex-end;justify-content:center;padding:0 0 env(safe-area-inset-bottom,0)}
+.mod-ov.on{opacity:1;pointer-events:all}
+.mod-box{background:var(--sf);border:1px solid var(--br2);border-radius:22px 22px 0 0;padding:28px 22px 28px;width:100%;max-width:480px;transform:translateY(100%);transition:transform .28s cubic-bezier(.32,0,.67,0);text-align:center}
+.mod-ov.on .mod-box{transform:translateY(0);transition-timing-function:cubic-bezier(.33,1,.68,1)}
+.mod-ic{font-size:36px;margin-bottom:10px}
+.mod-msg{font-size:17px;font-weight:600;color:var(--tx);line-height:1.4}
+.mod-sub{font-size:14px;color:var(--tx3);margin-top:6px;margin-bottom:24px;line-height:1.4}
+.mod-btns{display:flex;flex-direction:column;gap:10px}
+.mod-btn{width:100%;padding:16px;border-radius:14px;border:none;font-size:16px;font-weight:500;cursor:pointer;font-family:'Onest',sans-serif;-webkit-tap-highlight-color:transparent}
+.mod-cancel{background:var(--sf2);color:var(--tx2)}
+.mod-cancel:active{background:var(--sf3)}
+.mod-danger{background:var(--rdim);color:var(--red)}
+.mod-danger:active{filter:brightness(1.2)}
+.mis-section{padding:20px 18px 0}
+.mis-flabel{font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.mis-flabel::after{content:'✎';font-size:12px;opacity:.55;font-style:normal}
+.mis-inp{width:100%;background:var(--sf2);border:1px solid var(--br2);border-radius:14px;padding:16px;font-size:17px;color:var(--tx);outline:none;transition:border-color .2s,box-shadow .2s;font-family:'Onest',sans-serif;font-weight:500}
+.mis-inp:focus{border-color:rgba(255,235,150,.35);box-shadow:0 0 0 3px rgba(232,200,74,.07)}
+.mis-inp::placeholder{color:var(--tx3)}
+.mis-inp.sm{font-size:15px;padding:13px 16px;border-radius:12px;font-weight:400}
+.mis-select{width:100%;background:var(--sf2);border:1px solid var(--br2);border-radius:12px;padding:13px 36px 13px 16px;font-size:15px;color:var(--tx);outline:none;cursor:pointer;font-family:'Onest',sans-serif;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(240%2C230%2C200%2C0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.mis-link-card{background:var(--sf2);border:1px solid var(--br2);border-radius:14px;padding:14px 52px 14px 14px;margin-bottom:10px;position:relative;display:flex;flex-direction:column;gap:10px}
+.mis-link-card .mis-inp{border-radius:10px;padding:12px 14px;font-size:14px;font-weight:400;background:var(--sf3);border-color:var(--br)}
+.mis-link-del{position:absolute;top:50%;right:10px;transform:translateY(-50%);background:none;border:none;color:var(--tx3);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:18px}
+.mis-add-btn{background:none;border:1.5px dashed var(--br2);border-radius:14px;padding:16px;width:100%;color:var(--tx3);font-size:14px;cursor:pointer;font-family:'Onest',sans-serif;min-height:54px;-webkit-tap-highlight-color:transparent}
+.mis-add-btn:active{background:var(--sf2)}
+.mis-media-chip{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--sf2);border:1px solid var(--br2);margin-bottom:8px}
+.mis-media-thumb{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--sf3)}
+.mis-media-label{flex:1;font-size:13px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mis-media-del{background:none;border:none;color:var(--tx3);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:8px;font-size:18px}
 </style>
 </head>
 <body>
@@ -229,6 +358,45 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 
 <div class="toast" id="toast"></div>
 
+<!-- Mobile bottom tabs -->
+<div class="mob-tabs" id="mob-tabs">
+  <button class="mob-tab on" data-panel="wishlist" onclick="switchTab('wishlist')">
+    <span class="mob-tab-ic">📝</span><span>Вишлист</span>
+  </button>
+  <button class="mob-tab" data-panel="bookings" onclick="switchTab('bookings')">
+    <span class="mob-tab-ic">📋</span><span>Брони</span>
+  </button>
+  <button class="mob-tab" data-panel="settings" onclick="switchTab('settings')">
+    <span class="mob-tab-ic">⚙️</span><span>Настройки</span>
+  </button>
+</div>
+
+<!-- FAB (add category) -->
+<button class="mob-fab" id="mob-fab" onclick="addCategory();setTimeout(()=>{const els=document.querySelectorAll('.cat-block');if(els.length)els[els.length-1].scrollIntoView({behavior:'smooth'})},100)">+</button>
+
+<!-- Confirm modal -->
+<div class="mod-ov" id="mod-ov" onclick="if(event.target===this)closeModal(false)">
+  <div class="mod-box">
+    <div class="mod-ic" id="mod-ic">🗑</div>
+    <div class="mod-msg" id="mod-msg"></div>
+    <div class="mod-sub" id="mod-sub"></div>
+    <div class="mod-btns">
+      <button class="mod-btn mod-danger" id="mod-ok" onclick="closeModal(true)">Удалить</button>
+      <button class="mod-btn mod-cancel" onclick="closeModal(false)">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- Full-screen item editor (mobile) -->
+<div class="mob-item-screen" id="mob-item-screen">
+  <div class="mis-hdr">
+    <button class="mis-back" onclick="closeItemScreen()">←</button>
+    <span class="mis-title-span" id="mis-title-span">Желание</span>
+    <button class="mis-del-btn" onclick="deleteMobItem()">Удалить</button>
+  </div>
+  <div class="mis-body" id="mob-screen-body"></div>
+</div>
+
 <script>
 let TOKEN = '';
 let wishlist = [];
@@ -264,6 +432,7 @@ async function doAuth(t, silent = false) {
   appConfig = ac;
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').classList.add('on');
+  updateTopbarTitle();
   renderTab();
 }
 
@@ -278,9 +447,11 @@ if (_saved) doAuth(_saved, true);
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
 function switchTab(tab) {
+  document.getElementById('mob-item-screen')?.classList.remove('open');
   currentTab = tab;
   document.querySelectorAll('.pnav-item').forEach(el => el.classList.toggle('on', el.dataset.tab === tab));
   document.getElementById('save-btn').style.display = (tab === 'wishlist' || tab === 'settings') ? '' : 'none';
+  syncMobTabs(tab);
   renderTab();
 }
 
@@ -382,6 +553,7 @@ function renderCatBlock(cat, ci) {
         onchange="setCatField(${ci},'emoji',this.value)" onclick="event.stopPropagation()">
       <input class="cat-title-inp" value="${esc(cat.title||'')}" placeholder="Название"
         onchange="setCatField(${ci},'title',this.value)" onclick="event.stopPropagation()">
+      <span class="cat-edit-hint">✎</span>
       <input class="cat-sub-inp" value="${esc(cat.sub||'')}" placeholder="Описание"
         onchange="setCatField(${ci},'sub',this.value)" onclick="event.stopPropagation()">
       <span class="cat-toggle op">▶</span>
@@ -404,12 +576,16 @@ function renderItemRow(ci, ii, item, total) {
       <button class="link-del" onclick="deleteLink(${ci},${ii},${li})">✕</button>
     </div>`).join('');
 
-  return `<div class="item-row" id="ir-${ci}-${ii}">
+  return `<div class="item-row" id="ir-${ci}-${ii}" onclick="if(window.innerWidth<=720){event.preventDefault();openItemScreen(${ci},${ii})}">
     <div class="item-move">
       <button onclick="moveItem(${ci},${ii},-1)" ${ii===0?'disabled':''}>↑</button>
       <button onclick="moveItem(${ci},${ii},1)" ${ii===total-1?'disabled':''}>↓</button>
     </div>
     <div class="item-fields">
+      <div class="mob-item-display">
+        <div class="mob-item-name">${esc(item.name || 'Без названия')}</div>
+        ${item.sub ? `<div class="mob-item-sub">${esc(item.sub)}</div>` : '<div class="mob-item-sub" style="display:none"></div>'}
+      </div>
       <div class="item-row-top">
         <input class="item-name-inp" value="${esc(item.name||'')}" placeholder="Название желания"
           onchange="setItemField(${ci},${ii},'name',this.value)">
@@ -430,6 +606,7 @@ function renderItemRow(ci, ii, item, total) {
           onblur="if(this.value.trim()){addMedia(${ci},${ii},this.value);this.value=''}">
       </div>
     </div>
+    <span class="mob-item-arr">✎</span>
     <button class="item-del" onclick="deleteItem(${ci},${ii})" title="Удалить">✕</button>
   </div>`;
 }
@@ -510,17 +687,25 @@ function addCategory() {
 }
 
 function deleteCategory(ci) {
-  if (!confirm(`Удалить «${wishlist[ci].title}» и все желания?`)) return;
-  wishlist.splice(ci, 1);
-  renderWishlistEditor(); scheduleSave();
+  const title = wishlist[ci]?.title || 'категория';
+  const count = wishlist[ci]?.items?.length || 0;
+  showConfirm({
+    msg: `Удалить «${title}»?`,
+    sub: count > 0 ? `Вместе с ней удалится ${count} ${plural(count,'желание','желания','желаний')}` : 'Категория пустая',
+    cb: () => { wishlist.splice(ci, 1); renderWishlistEditor(); scheduleSave(); }
+  });
 }
 
 function addItem(ci) {
   if (!wishlist[ci].items) wishlist[ci].items = [];
-  wishlist[ci].items.push({ id:'item_'+Date.now(), name:'', sub:'', links:[] });
-  renderWishlistEditor();
+  wishlist[ci].items.push({ id:'item_'+Date.now(), name:'', sub:'', links:[], media:[] });
   const ii = wishlist[ci].items.length - 1;
-  setTimeout(() => document.querySelector(`#ir-${ci}-${ii} .item-name-inp`)?.focus(), 50);
+  renderWishlistEditor();
+  if (window.innerWidth <= 720) {
+    setTimeout(() => openItemScreen(ci, ii), 60);
+  } else {
+    setTimeout(() => document.querySelector(`#ir-${ci}-${ii} .item-name-inp`)?.focus(), 50);
+  }
 }
 
 function deleteItem(ci, ii) { wishlist[ci].items.splice(ii,1); renderWishlistEditor(); scheduleSave(); }
@@ -594,6 +779,14 @@ async function renderSettings() {
   const parsersHtml = Object.entries(parsers).map(([id, cfg]) => renderParserRow(id, cfg)).join('');
 
   el.innerHTML = `
+    <div class="settings-section">
+      <div class="sect-hdr"><h2>⚙️ Общие</h2></div>
+      <div class="pl-row">
+        <div style="font-size:11px;color:var(--tx3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Название вишлиста</div>
+        <input class="pl-inp" value="${esc(appConfig.title||'')}" placeholder="Мой вишлист"
+          oninput="appConfig.title=this.value;updateTopbarTitle()" onblur="saveAppConfig()">
+      </div>
+    </div>
     <div class="settings-section">
       <div class="sect-hdr">
         <h2>📌 Закреплённые ссылки</h2>
@@ -833,14 +1026,213 @@ async function renderBookings() {
 }
 
 async function deleteBk(itemId) {
-  if (!confirm('Снять бронь?')) return;
-  await fetch(`/api/admin/bookings/${itemId}`, { method:'DELETE', headers:{'x-admin-token':TOKEN} });
-  showToast('Бронь снята'); renderBookings();
+  showConfirm({
+    ic: '🔓', msg: 'Снять бронь?', okLabel: 'Снять',
+    cb: async () => {
+      await fetch(`/api/admin/bookings/${itemId}`, { method:'DELETE', headers:{'x-admin-token':TOKEN} });
+      showToast('Бронь снята'); renderBookings();
+    }
+  });
 }
 async function deleteAllBk() {
-  if (!confirm('Снять ВСЕ брони? Необратимо.')) return;
-  await fetch('/api/admin/bookings', { method:'DELETE', headers:{'x-admin-token':TOKEN} });
-  showToast('Все брони сняты'); renderBookings();
+  showConfirm({
+    ic: '🔓', msg: 'Снять все брони?', sub: 'Это действие нельзя отменить', okLabel: 'Снять все',
+    cb: async () => {
+      await fetch('/api/admin/bookings', { method:'DELETE', headers:{'x-admin-token':TOKEN} });
+      showToast('Все брони сняты'); renderBookings();
+    }
+  });
+}
+
+// ── MOBILE ITEM SCREEN ─────────────────────────────────────────────────────
+let mobEditCi = -1, mobEditIi = -1;
+
+function openItemScreen(ci, ii) {
+  mobEditCi = ci; mobEditIi = ii;
+  const item = wishlist[ci]?.items[ii];
+  if (!item) return;
+
+  // Category selector
+  const catOptions = wishlist.map((c, i) =>
+    `<option value="${i}" ${i===ci?'selected':''}>${esc(c.emoji||'📦')} ${esc(c.title||'Категория')}</option>`
+  ).join('');
+
+  // Hero photo
+  const firstPhoto = (item.media||[]).find(m => /\.(jpe?g|png|webp|gif|avif)$/i.test(m) || m.startsWith('/uploads/') || m.startsWith('http'));
+  const photoHtml = firstPhoto
+    ? `<img class="mis-photo-bg" src="${esc(firstPhoto)}" onerror="this.style.display='none'">
+       <div class="mis-photo-overlay">
+         <span style="font-size:28px">📷</span>
+         <span class="mis-photo-label">Изменить фото</span>
+       </div>`
+    : `<span class="mis-photo-placeholder">📷</span>
+       <span class="mis-photo-label">Добавить фото из галереи</span>`;
+
+  // Links
+  const linksHtml = (item.links||[]).map((l, li) => `
+    <div class="mis-link-card">
+      <input class="mis-inp" placeholder="Текст ссылки" value="${esc(l.label||'')}"
+        oninput="setLinkField(${ci},${ii},${li},'label',this.value);updateMobCard(${ci},${ii})">
+      <input class="mis-inp" placeholder="https://…" value="${esc(l.url||'')}"
+        oninput="setLinkField(${ci},${ii},${li},'url',this.value)">
+      <button class="mis-link-del" onclick="deleteLink(${ci},${ii},${li});openItemScreen(${ci},${ii})">✕</button>
+    </div>`).join('');
+
+  // Media chips
+  const mediaHtml = (item.media||[]).map((m, mi) => {
+    const isImg = /\.(jpe?g|png|webp|gif|avif)$/i.test(m)||m.startsWith('/uploads/')||m.startsWith('http');
+    const thumb = isImg
+      ? `<img class="mis-media-thumb" src="${esc(m)}" onerror="this.style.display='none'">`
+      : `<span style="font-size:22px;width:36px;text-align:center;flex-shrink:0">🔗</span>`;
+    const short = m.length>40?m.slice(0,38)+'…':m;
+    return `<div class="mis-media-chip">${thumb}
+      <span class="mis-media-label" title="${esc(m)}">${esc(short)}</span>
+      <button class="mis-media-del" onclick="removeMedia(${ci},${ii},${mi});openItemScreen(${ci},${ii})">✕</button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('mob-screen-body').innerHTML = `
+    <div class="mis-section" style="margin-top:20px">
+      <div class="mis-flabel">Фото</div>
+      <label class="mis-photo-area ${firstPhoto ? 'has-photo' : ''}">
+        ${photoHtml}
+        <input type="file" accept="image/*" style="display:none" onchange="uploadPhoto(this,${ci},${ii})">
+      </label>
+    </div>
+
+    <div class="mis-section" style="margin-top:18px">
+      <div class="mis-flabel">Название</div>
+      <input class="mis-inp" id="mis-name-inp" value="${esc(item.name||'')}" placeholder="Что хочешь получить?"
+        oninput="setItemField(${ci},${ii},'name',this.value);updateMobCard(${ci},${ii});updateScreenTitle(this.value)">
+    </div>
+
+    <div class="mis-section" style="margin-top:16px">
+      <div class="mis-flabel">Уточнение / цена</div>
+      <input class="mis-inp sm" value="${esc(item.sub||'')}" placeholder="Цена, размер, цвет…"
+        oninput="setItemField(${ci},${ii},'sub',this.value);updateMobCard(${ci},${ii})">
+    </div>
+
+    <div class="mis-section" style="margin-top:16px">
+      <div class="mis-flabel">Категория</div>
+      <select class="mis-select" onchange="moveItemToCat(${ci},${ii},+this.value)">${catOptions}</select>
+    </div>
+
+    <div class="mis-section" style="margin-top:24px">
+      <div class="mis-flabel">Ссылки</div>
+      ${linksHtml}
+      <button class="mis-add-btn" onclick="addLink(${ci},${ii});openItemScreen(${ci},${ii})">+ Добавить ссылку</button>
+    </div>
+
+    ${(item.media||[]).length > 0 ? `
+    <div class="mis-section" style="margin-top:24px">
+      <div class="mis-flabel">Все фотографии</div>
+      ${mediaHtml}
+      <input class="mis-inp sm" style="margin-top:2px" placeholder="+ URL фото, Enter чтобы добавить"
+        onkeydown="if(event.key==='Enter'&&this.value.trim()){addMedia(${ci},${ii},this.value.trim());this.value='';openItemScreen(${ci},${ii})}">
+    </div>` : ''}`;
+
+  document.getElementById('mob-item-screen').classList.add('open');
+  document.getElementById('mis-title-span').textContent = item.name || 'Новое желание';
+  if (!item.name) setTimeout(() => document.getElementById('mis-name-inp')?.focus(), 360);
+}
+
+function closeItemScreen() {
+  document.getElementById('mob-item-screen').classList.remove('open');
+  mobEditCi = -1; mobEditIi = -1;
+  scheduleSave();
+}
+
+function deleteMobItem() {
+  if (mobEditCi < 0) return;
+  const name = wishlist[mobEditCi]?.items[mobEditIi]?.name || 'желание';
+  showConfirm({
+    msg: `Удалить «${name}»?`,
+    sub: 'Желание пропадёт навсегда',
+    cb: () => {
+      deleteItem(mobEditCi, mobEditIi);
+      document.getElementById('mob-item-screen').classList.remove('open');
+      mobEditCi = -1; mobEditIi = -1;
+    }
+  });
+}
+
+async function uploadPhoto(input, ci, ii) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = '';
+  showToast('Загружаем фото…');
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const base64 = e.target.result.split(',')[1];
+      const r = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
+        body: JSON.stringify({ filename: file.name, data: base64 }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || r.status);
+      addMedia(ci, ii, data.url);
+      openItemScreen(ci, ii);
+      showToast('✓ Фото добавлено');
+    } catch(e) { showToast('Ошибка: ' + e.message); }
+  };
+  reader.readAsDataURL(file);
+}
+
+function moveItemToCat(fromCi, ii, toCi) {
+  if (fromCi === toCi) return;
+  const item = wishlist[fromCi].items.splice(ii, 1)[0];
+  if (!wishlist[toCi].items) wishlist[toCi].items = [];
+  wishlist[toCi].items.push(item);
+  const newIi = wishlist[toCi].items.length - 1;
+  renderWishlistEditor();
+  setTimeout(() => openItemScreen(toCi, newIi), 60);
+  scheduleSave();
+}
+
+function updateScreenTitle(name) {
+  const el = document.getElementById('mis-title-span');
+  if (el) el.textContent = name || 'Новое желание';
+}
+
+// ── CONFIRM MODAL ──────────────────────────────────────────────────────────
+let _modalCb = null;
+function showConfirm({ ic = '🗑', msg, sub = '', okLabel = 'Удалить', cb }) {
+  document.getElementById('mod-ic').textContent = ic;
+  document.getElementById('mod-msg').textContent = msg;
+  document.getElementById('mod-sub').textContent = sub;
+  document.getElementById('mod-ok').textContent = okLabel;
+  _modalCb = cb;
+  document.getElementById('mod-ov').classList.add('on');
+}
+function closeModal(confirmed) {
+  document.getElementById('mod-ov').classList.remove('on');
+  const cb = _modalCb; _modalCb = null;
+  if (confirmed && cb) cb();
+}
+
+function updateTopbarTitle() {
+  const el = document.querySelector('.topbar-logo');
+  if (el && appConfig.title) el.innerHTML = `${esc(appConfig.title)} <em>✦</em>`;
+}
+
+function updateMobCard(ci, ii) {
+  const item = wishlist[ci]?.items[ii];
+  if (!item) return;
+  const row = document.getElementById(`ir-${ci}-${ii}`);
+  if (!row) return;
+  const nameEl = row.querySelector('.mob-item-name');
+  const subEl = row.querySelector('.mob-item-sub');
+  if (nameEl) nameEl.textContent = item.name || 'Без названия';
+  if (subEl) { subEl.textContent = item.sub || ''; subEl.style.display = item.sub ? '' : 'none'; }
+}
+
+// ── MOBILE TABS SYNC ───────────────────────────────────────────────────────
+function syncMobTabs(panelId) {
+  document.querySelectorAll('.mob-tab').forEach(t => t.classList.toggle('on', t.dataset.panel === panelId));
+  const fab = document.getElementById('mob-fab');
+  if (fab) fab.style.display = panelId === 'wishlist' ? '' : 'none';
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────

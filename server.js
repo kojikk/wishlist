@@ -353,6 +353,25 @@ app.post('/api/admin/parsers/:id/refresh', adminAuth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ─── Admin: upload ───────────────────────────────────────────────────────────
+
+const UPLOADS_DIR = path.join(PUBLIC_DIR, 'uploads');
+const ALLOWED_IMG_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
+
+app.post('/api/admin/upload', adminAuth, express.json({ limit: '20mb' }), (req, res) => {
+  const { filename, data } = req.body || {};
+  if (!filename || !data) return res.status(400).json({ error: 'filename and data required' });
+  const ext = path.extname(filename).toLowerCase();
+  if (!ALLOWED_IMG_EXT.has(ext)) return res.status(400).json({ error: 'Unsupported file type' });
+  let buf;
+  try { buf = Buffer.from(data, 'base64'); } catch { return res.status(400).json({ error: 'Invalid base64' }); }
+  if (buf.length > 10 * 1024 * 1024) return res.status(400).json({ error: 'File too large (max 10 MB)' });
+  if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  const safe = `${Date.now()}_${path.basename(filename).replace(/[^\w.-]/g, '_')}`;
+  fs.writeFileSync(path.join(UPLOADS_DIR, safe), buf);
+  res.json({ url: `/uploads/${safe}` });
+});
+
 // ─── Admin UI ────────────────────────────────────────────────────────────────
 
 app.get('/admin', (req, res) => {
