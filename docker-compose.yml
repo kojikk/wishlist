@@ -1,10 +1,10 @@
 services:
   app:
     build: .
-    container_name: tg-wishlist
+    container_name: amginne-wishlist
     restart: unless-stopped
     ports:
-      - "3050:3000"    # для прямого доступа во время разработки; продакшен ходит через Caddy
+      - "3051:3000"    # для прямого доступа во время разработки; продакшен ходит через Caddy
     volumes:
       - ./data:/app/data
       # Конфиг монтируем как volume — можно редактировать без rebuild

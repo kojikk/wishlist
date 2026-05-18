@@ -2,6 +2,7 @@
 .env
 config/app.json
 config/wishlist.json
+config/*_cookies.json
 
 # Runtime data
 data/

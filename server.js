@@ -307,13 +307,40 @@ app.get('/api/admin/parsers', adminAuth, (req, res) => {
   const result = {};
   for (const [id, cfg] of Object.entries(appCfg.parsers || {})) {
     const cached = parserCache.get(id);
+    const cookiesFile = PARSERS[id]?.meta?.cookiesFile;
     result[id] = {
-      enabled: cfg.enabled,
-      itemCount: cached?.cats?.reduce((s, c) => s + c.items.length, 0) ?? null,
-      fetchedAt: cached?.fetchedAt ?? null,
+      enabled:     cfg.enabled,
+      itemCount:   cached?.cats?.reduce((s, c) => s + c.items.length, 0) ?? null,
+      fetchedAt:   cached?.fetchedAt ?? null,
+      cookiesFile: cookiesFile || null,
+      hasCookies:  cookiesFile ? fs.existsSync(path.join(CONFIG_DIR, cookiesFile)) : false,
     };
   }
   res.json(result);
+});
+
+app.post('/api/admin/parsers/:id/cookies', adminAuth, (req, res) => {
+  const parser = PARSERS[req.params.id];
+  if (!parser?.meta?.cookiesFile)
+    return res.status(404).json({ error: 'Этот парсер не поддерживает импорт кук' });
+
+  const content = req.body?.cookies;
+  if (!content || typeof content !== 'string' || content.trim().length < 2)
+    return res.status(400).json({ error: 'Пустое содержимое' });
+
+  const trimmed = content.trim();
+  // Принимаем JSON-массив или Netscape-формат
+  if (!trimmed.startsWith('[') && !trimmed.startsWith('#') &&
+      !trimmed.match(/^\.?[\w.-]+\s+(TRUE|FALSE)/im)) {
+    return res.status(400).json({ error: 'Неверный формат: ожидается JSON-массив или Netscape cookies' });
+  }
+
+  try {
+    fs.writeFileSync(path.join(CONFIG_DIR, parser.meta.cookiesFile), content, 'utf8');
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.post('/api/admin/parsers/:id/refresh', adminAuth, async (req, res) => {
