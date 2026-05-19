@@ -406,18 +406,18 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 /* ═══ ADMIN MODE ═══ */
 .adm{display:none!important}
 body.admin-mode .adm{display:flex!important}
-#adm-toggle{position:fixed;bottom:68px;right:18px;z-index:900;width:38px;height:38px;border-radius:50%;background:var(--sf2);border:1px solid var(--br2);cursor:pointer;font-size:16px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.45);color:var(--tx2);transition:.2s}
-#adm-toggle.visible{display:flex}
-#adm-toggle.active{background:var(--ac);border-color:transparent;color:#0f0f0f}
-.item-card{position:relative}
-.adm-item-pencil{position:absolute;bottom:7px;right:7px;width:26px;height:26px;border-radius:50%;background:var(--ac);border:none;cursor:pointer;font-size:11px;color:#0f0f0f;z-index:5;align-items:center;justify-content:center}
-.adm-cat-add{width:22px;height:22px;border-radius:50%;background:var(--ac);border:none;cursor:pointer;font-size:15px;line-height:1;color:#0f0f0f;flex-shrink:0;margin-left:6px;align-items:center;justify-content:center}
-.pinned-link,.steam-card{position:relative}
-.adm-pl-pencil{position:absolute;top:7px;right:7px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12);cursor:pointer;font-size:11px;color:rgba(255,255,255,.7);z-index:5;align-items:center;justify-content:center}
+.adm-cat-add{width:22px;height:22px;border-radius:50%;background:var(--sf2);border:1px solid var(--br2);cursor:pointer;font-size:14px;line-height:1;color:var(--tx2);flex-shrink:0;margin-left:6px;align-items:center;justify-content:center;transition:.15s}
+.adm-cat-add:hover{background:var(--ac);border-color:transparent;color:#0f0f0f}
 .adm-title-pencil{display:none;width:20px;height:20px;border-radius:4px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--tx3);align-items:center;justify-content:center;vertical-align:middle;margin-left:4px}
 body.admin-mode .adm-title-pencil{display:inline-flex}
-#adm-add-cat-btn{margin:14px 0 4px;display:none;align-items:center;justify-content:center;gap:8px;padding:11px 20px;background:var(--sf);border:1px dashed var(--br2);border-radius:10px;cursor:pointer;color:var(--tx2);font-size:13px;font-family:'Onest',sans-serif;width:100%}
+#adm-add-cat-btn{display:none;width:32px;height:32px;border-radius:50%;background:var(--sf);border:1px dashed var(--br2);cursor:pointer;color:var(--tx2);font-size:16px;line-height:1;margin:16px auto 4px;align-items:center;justify-content:center;transition:.15s}
+#adm-add-cat-btn:hover{background:var(--sf2);border-color:var(--br3);color:var(--tx)}
 body.admin-mode #adm-add-cat-btn{display:flex}
+.adm-settings-btn{display:none;width:30px;height:30px;border-radius:50%;background:var(--sf2);border:1px solid var(--br);color:var(--tx2);cursor:pointer;font-size:13px;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+.adm-settings-btn:hover{background:var(--sf3);color:var(--tx);border-color:var(--br2)}
+body.admin-mode .adm-settings-btn{display:inline-flex}
+.adm-m-edit{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--sf2);border:1px solid var(--br2);color:var(--tx2);cursor:pointer;font-size:13px;align-items:center;justify-content:center;z-index:3;transition:.15s}
+.adm-m-edit:hover{background:var(--sf3);color:var(--tx)}
 #adm-item-screen{position:fixed;inset:0;z-index:1200;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
 #adm-item-screen.on{transform:translateX(0)}
 .adm-screen-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--br);flex-shrink:0}
@@ -472,6 +472,9 @@ body.admin-mode #adm-add-cat-btn{display:flex}
     <button class="eye-btn" id="eye-desk" onclick="toggleReveal()">
       <span>👁</span><span id="eye-desk-lbl">Показать кто бронирует</span>
     </button>
+    <button class="adm-settings-btn" onclick="admGoToSettings()" title="Настройки вишлиста" style="margin-top:8px;width:100%;height:34px;border-radius:8px;font-size:12px;gap:6px">
+      <span>⚙</span><span>Настройки вишлиста</span>
+    </button>
   </div>
 </aside>
 
@@ -479,6 +482,7 @@ body.admin-mode #adm-add-cat-btn{display:flex}
   <div class="mob-hdr">
     <div class="mob-top">
       <div class="mob-logo">Вишлист <em>✦</em></div>
+      <button class="adm-settings-btn" onclick="admGoToSettings()" title="Настройки">⚙</button>
       <div class="mob-eye" id="eye-mob" onclick="toggleReveal()">👁</div>
     </div>
     <div class="view-tabs mob-view-tabs" id="mob-view-tabs"></div>
@@ -593,8 +597,6 @@ body.admin-mode #adm-add-cat-btn{display:flex}
 
 <div class="toast" id="toast"></div>
 <div class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
-
-<button id="adm-toggle" onclick="toggleAdminMode()">✎</button>
 
 <div id="adm-item-screen">
   <div class="adm-screen-head">
@@ -945,12 +947,10 @@ function setView(id) {
 }
 
 // ── PINNED LINKS ──────────────────────────────────────────────────────────────
-function renderPinnedLink(link, delay, li){
+function renderPinnedLink(link, delay){
   const anim = `animation-delay:${delay*60}ms`;
-  const pencil = `<button class="adm adm-pl-pencil" onclick="event.preventDefault();event.stopPropagation();admEditPinnedLink(${li})">✎</button>`;
   if(link.type==='steam'){
     return `<a class="steam-card" href="${link.url}" target="_blank" style="${anim}">
-      ${pencil}
       <div class="steam-logo"><img src="/media/icons/steam_logo_icon.svg" width="24" height="24"></div>
       <div>
         <div class="steam-name">${link.label||'Steam'}</div>
@@ -960,7 +960,6 @@ function renderPinnedLink(link, delay, li){
     </a>`;
   }
   return `<a class="pinned-link" href="${link.url}" target="_blank" style="${anim}">
-    ${pencil}
     ${link.icon?`<div class="pl-icon">${link.icon}</div>`:''}
     <div>
       <div class="pl-name">${link.label}</div>
@@ -1058,7 +1057,7 @@ function renderContentWishlist() {
   let topHtml='';
   if(!q&&activeCat==='all'){
     const parts=[];
-    (CFG.pinned_links||[]).forEach((lnk,i)=>parts.push(renderPinnedLink(lnk,i,i)));
+    (CFG.pinned_links||[]).forEach((lnk,i)=>parts.push(renderPinnedLink(lnk,i)));
     (CFG.info_cards||[]).forEach((card,i)=>{
       const n=parts.length;
       const contacts=(card.contacts||[]).map(c=>`<a href="https://t.me/${c.username}" class="ic-chip">${c.label}</a>`).join('');
@@ -1074,7 +1073,7 @@ function renderContentWishlist() {
     if(parts.length) topHtml=`<div class="top-cards">${parts.join('')}</div>`;
   }
 
-  el.innerHTML=topHtml+filtered.map((cat,ci)=>renderSection(cat,ci)).join('')+`<button id="adm-add-cat-btn" onclick="admAddCat()">+ Добавить категорию</button>`;
+  el.innerHTML=topHtml+filtered.map((cat,ci)=>renderSection(cat,ci)).join('')+`<button id="adm-add-cat-btn" onclick="admAddCat()" title="Создать категорию">+</button>`;
   attachSwipes();
   afterRender();
 }
@@ -1218,7 +1217,6 @@ function renderItem(item,delay){
     ${l.label}</a>`).join('')}</div>`:'';
 
   return `<div class="item-card ${cls}" id="ic-${item.id}" data-id="${item.id}" onclick="openModal('${item.id}')" style="animation-delay:${delay*28}ms">
-    <button class="adm adm-item-pencil" onclick="event.stopPropagation();admOpenItemEditor('${item.id}')">✎</button>
     <div class="item-inner">
       <div class="dot"></div>
       <div class="item-body">
@@ -1340,7 +1338,8 @@ function openModal(itemId){
         ${isSteam?`<img src="/media/icons/steam_logo_icon.svg" width="12" height="12" style="opacity:.7">`:`<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3m0-3L5 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`}
         ${l.label}</a>`;
     }).join('')}</div>`:'';
-  let html=`<div class="m-emoji">${cat.emoji}</div>
+  let html=`<button class="adm adm-m-edit" onclick="closeModal();admOpenItemEditor('${item.id}')" title="Редактировать">✎</button>
+    <div class="m-emoji">${cat.emoji}</div>
     <div class="m-title">${item.name}</div>
     ${item.sub?`<div class="m-sub">${item.sub}</div>`:'<div style="margin-bottom:14px"></div>'}
     ${tagsHtml}${mediaHtml}${linksHtml}`;
@@ -1430,17 +1429,12 @@ function admHeaders(){
 
 function _admEnable(){
   isAdminUser=true;
-  const btn=document.getElementById('adm-toggle');
-  btn.classList.add('visible');
-  // Авто-активация админ-режима
-  if(!adminMode){
-    adminMode=true;
-    document.body.classList.add('admin-mode');
-    btn.classList.add('active');
-    btn.textContent='✓';
-    renderContent();
-  }
+  adminMode=true;
+  document.body.classList.add('admin-mode');
+  renderContent();
 }
+
+function admGoToSettings(){ window.location.href='/admin'; }
 
 async function initAdminAuth(){
   // 1) Пробуем сохранённый токен из админки (localStorage)
@@ -1461,16 +1455,6 @@ async function initAdminAuth(){
     const d=await r.json();
     if(d.ok&&d.sessionId){ adminSession=d.sessionId; _admEnable(); }
   }catch{}
-}
-
-function toggleAdminMode(){
-  adminMode=!adminMode;
-  document.body.classList.toggle('admin-mode',adminMode);
-  const btn=document.getElementById('adm-toggle');
-  btn.classList.toggle('active',adminMode);
-  btn.textContent=adminMode?'✓':'✎';
-  haptic('medium');
-  renderContent();
 }
 
 async function admSaveWishlist(){
