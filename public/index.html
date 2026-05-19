@@ -1428,20 +1428,38 @@ function admHeaders(){
   return h;
 }
 
-async function initAdminAuth(){
-  // Если есть сохранённый токен от админки — сразу показываем кнопку
-  if(localStorage.getItem('adminToken')){
-    isAdminUser=true;
-    document.getElementById('adm-toggle').classList.add('visible');
-    return;
+function _admEnable(){
+  isAdminUser=true;
+  const btn=document.getElementById('adm-toggle');
+  btn.classList.add('visible');
+  // Авто-активация админ-режима
+  if(!adminMode){
+    adminMode=true;
+    document.body.classList.add('admin-mode');
+    btn.classList.add('active');
+    btn.textContent='✓';
+    renderContent();
   }
-  // Иначе пробуем TG-сессию
+}
+
+async function initAdminAuth(){
+  // 1) Пробуем сохранённый токен из админки (localStorage)
+  const localToken=localStorage.getItem('adminToken');
+  if(localToken){
+    try{
+      const r=await fetch('/api/admin/wishlist',{headers:{'x-admin-token':localToken}});
+      if(r.ok){ _admEnable(); return; }
+      // Токен невалидный — чистим
+      if(r.status===401||r.status===403) localStorage.removeItem('adminToken');
+    }catch{}
+  }
+  // 2) Пробуем TG-сессию (если открыто в Telegram WebApp)
   if(!tg?.initData) return;
   try{
     const r=await fetch('/api/auth/tg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData})});
     if(!r.ok) return;
     const d=await r.json();
-    if(d.ok&&d.sessionId){ adminSession=d.sessionId; isAdminUser=true; document.getElementById('adm-toggle').classList.add('visible'); }
+    if(d.ok&&d.sessionId){ adminSession=d.sessionId; _admEnable(); }
   }catch{}
 }
 
