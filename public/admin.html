@@ -336,21 +336,21 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
     <span class="topbar-badge">ADMIN</span>
     <span class="save-status" id="save-status"></span>
     <div class="topbar-right">
-      <button class="tbtn" onclick="window.open('/', '_blank')">← Открыть сайт</button>
+      <button class="tbtn" onclick="window.location.href='/'">← Назад к вишлисту</button>
       <button class="tbtn danger" onclick="doLogout()" title="Выйти и забыть токен">Выйти</button>
       <button class="tbtn primary" id="save-btn" onclick="handleSave()">Сохранить</button>
     </div>
   </div>
   <div class="body">
     <nav class="panel-nav" id="panel-nav">
+      <div class="pnav-item" data-tab="settings" onclick="switchTab('settings')">
+        <span class="pnav-em">⚙️</span> Настройки
+      </div>
       <div class="pnav-item on" data-tab="wishlist" onclick="switchTab('wishlist')">
-        <span class="pnav-em">📋</span> Вишлист
+        <span class="pnav-em">🎁</span> Подарки
       </div>
       <div class="pnav-item" data-tab="bookings" onclick="switchTab('bookings')">
         <span class="pnav-em">🔒</span> Брони
-      </div>
-      <div class="pnav-item" data-tab="settings" onclick="switchTab('settings')">
-        <span class="pnav-em">⚙️</span> Настройки
       </div>
     </nav>
     <div class="panel-main" id="panel-main">
@@ -363,14 +363,14 @@ body{background:var(--bg);color:var(--tx);font-family:'Onest',sans-serif;font-si
 
 <!-- Mobile bottom tabs -->
 <div class="mob-tabs" id="mob-tabs">
+  <button class="mob-tab" data-panel="settings" onclick="switchTab('settings')">
+    <span class="mob-tab-ic">⚙️</span><span>Настройки</span>
+  </button>
   <button class="mob-tab on" data-panel="wishlist" onclick="switchTab('wishlist')">
-    <span class="mob-tab-ic">📝</span><span>Вишлист</span>
+    <span class="mob-tab-ic">🎁</span><span>Подарки</span>
   </button>
   <button class="mob-tab" data-panel="bookings" onclick="switchTab('bookings')">
     <span class="mob-tab-ic">📋</span><span>Брони</span>
-  </button>
-  <button class="mob-tab" data-panel="settings" onclick="switchTab('settings')">
-    <span class="mob-tab-ic">⚙️</span><span>Настройки</span>
   </button>
 </div>
 

@@ -468,13 +468,11 @@ body.admin-mode .adm-settings-btn{display:inline-flex}
   </div>
   <div class="view-tabs" id="view-tabs"></div>
   <nav class="sb-nav" id="sb-nav"></nav>
-  <div class="sb-foot">
-    <button class="eye-btn" id="eye-desk" onclick="toggleReveal()">
+  <div class="sb-foot" style="display:flex;gap:8px;align-items:center">
+    <button class="eye-btn" id="eye-desk" onclick="toggleReveal()" style="flex:1;min-width:0">
       <span>👁</span><span id="eye-desk-lbl">Показать кто бронирует</span>
     </button>
-    <button class="adm-settings-btn" onclick="admGoToSettings()" title="Настройки вишлиста" style="margin-top:8px;width:100%;height:34px;border-radius:8px;font-size:12px;gap:6px">
-      <span>⚙</span><span>Настройки вишлиста</span>
-    </button>
+    <button class="adm-settings-btn" onclick="admGoToSettings()" title="Настройки вишлиста" style="width:34px;height:34px;border-radius:8px">⚙</button>
   </div>
 </aside>
 
@@ -482,8 +480,10 @@ body.admin-mode .adm-settings-btn{display:inline-flex}
   <div class="mob-hdr">
     <div class="mob-top">
       <div class="mob-logo">Вишлист <em>✦</em></div>
-      <button class="adm-settings-btn" onclick="admGoToSettings()" title="Настройки">⚙</button>
-      <div class="mob-eye" id="eye-mob" onclick="toggleReveal()">👁</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="adm-settings-btn" onclick="admGoToSettings()" title="Настройки вишлиста">⚙</button>
+        <div class="mob-eye" id="eye-mob" onclick="toggleReveal()">👁</div>
+      </div>
     </div>
     <div class="view-tabs mob-view-tabs" id="mob-view-tabs"></div>
     <div class="mob-pills" id="mob-pills"><span class="sb-pill">…</span></div>
@@ -1019,9 +1019,7 @@ function renderSection(cat, ci) {
     itemsHtml = cat.items.map((item,ii)=>renderItem(item,ii)).join('');
   }
 
-  const estHeight = isOpen
-    ? (viewLayout === 'grid' ? Math.ceil(cat.items.length / 2) * 200 : cat.items.length * 95) + 'px'
-    : '0';
+  const estHeight = isOpen ? 'none' : '0';
 
   return `<div class="section" style="animation-delay:${ci*48}ms" id="sec-${cat.id}">
     <div class="sec-head" onclick="toggleSec('${cat.id}')">
@@ -1286,9 +1284,10 @@ function toggleSec(id){
   const arr = document.getElementById('arr-'+id);
   if (list) {
     if (!wasOpen) {
-      // opening
+      // opening: animate from 0 to scrollHeight, then release so lazy images can grow content
       list.classList.add('op');
       list.style.maxHeight = list.scrollHeight + 'px';
+      setTimeout(() => { if (openSecs.has(id)) list.style.maxHeight = 'none'; }, 400);
     } else {
       // closing: set explicit height first, then animate to 0
       list.style.maxHeight = list.scrollHeight + 'px';
